@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup Builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Noto+Sans:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&family=Source+Code+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+
+:root {
+  --indigo-50:#eef2ff;--indigo-100:#e0e7ff;--indigo-200:#c7d2fe;--indigo-300:#a5b4fc;--indigo-400:#818cf8;
+  --indigo-500:#6366f1;--indigo-600:#4f46e5;--indigo-700:#4338ca;--indigo-800:#3730a3;
+  --amber-100:#fef3c7;--amber-200:#fde68a;--amber-300:#fcd34d;--amber-400:#fbbf24;--amber-500:#f59e0b;--amber-600:#d97706;
+  --emerald-100:#d1fae5;--emerald-200:#a7f3d0;--emerald-400:#34d399;--emerald-500:#10b981;
+  --rose-100:#ffe4e6;--rose-400:#fb7185;--rose-500:#f43f5e;
+  --slate-50:#f8fafc;--slate-100:#f1f5f9;--slate-200:#e2e8f0;--slate-300:#cbd5e1;--slate-400:#94a3b8;
+  --slate-500:#64748b;--slate-600:#475569;--slate-700:#334155;
+  --bg:#f1f4f9;--surface:#ffffff;--surface2:#f8faff;--border:#dde3f0;--border2:#c7d0e8;
+  --text:#1e1b4b;--text-mid:#312e81;--text-muted:#6366f1;--text-faint:#a5b4fc;
+  --shadow-sm:0 1px 4px rgba(99,102,241,0.08),0 1px 2px rgba(99,102,241,0.05);
+  --shadow-md:0 4px 20px rgba(99,102,241,0.10);
+  --shadow-lg:0 12px 40px rgba(99,102,241,0.14);
+  --radius:16px;
+  --font:'Outfit','Noto Sans SC',system-ui,sans-serif;
+  --mono:'Source Code Pro','Noto Sans SC',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{
+  font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow:hidden;
+  background-image:radial-gradient(ellipse at 20% 10%,rgba(99,102,241,0.06) 0%,transparent 50%),
+                   radial-gradient(ellipse at 80% 90%,rgba(251,191,36,0.05) 0%,transparent 50%);
+}
+button{font-family:var(--font);}
+
+/* HEADER */
+.header{height:58px;background:var(--surface);border-bottom:1.5px solid var(--border);box-shadow:var(--shadow-sm);
+  display:flex;align-items:center;padding:0 24px;gap:16px;position:relative;z-index:50;}
+.header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--indigo-500),var(--indigo-300),var(--amber-400));}
+.header-logo{display:flex;align-items:center;gap:10px;}
+.logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--indigo-600),var(--indigo-400));border-radius:8px;
+  display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 3px 10px rgba(79,70,229,0.3);}
+.logo-name{font-size:17px;font-weight:700;color:var(--indigo-700);letter-spacing:-0.3px;}
+.logo-version{font-size:10px;font-family:var(--mono);background:var(--indigo-100);color:var(--indigo-600);
+  padding:2px 7px;border-radius:10px;font-weight:600;border:1px solid var(--indigo-200);}
+.header-sep{flex:1;}
+.header-status{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--slate-500);font-family:var(--mono);}
+.status-dot{width:7px;height:7px;border-radius:50%;background:var(--emerald-500);animation:pulse-dot 2s infinite;}
+@keyframes pulse-dot{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(16,185,129,0.4);}50%{opacity:0.7;box-shadow:0 0 0 4px rgba(16,185,129,0);}}
+
+/* LAYOUT */
+.workspace{height:calc(100vh - 58px);display:grid;grid-template-columns:1fr 1fr 360px;overflow:hidden;}
+.panel{display:flex;flex-direction:column;border-right:1.5px solid var(--border);overflow:hidden;min-width:0;}
+.panel-toolbar{padding:10px 16px;background:var(--surface);border-bottom:1.5px solid var(--border);
+  display:flex;flex-direction:column;gap:8px;flex-shrink:0;}
+.panel-toolbar-row{display:flex;align-items:center;gap:8px;}
+.panel-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--slate-500);font-family:var(--mono);}
+.panel-title{font-size:14px;font-weight:600;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.panel-body{flex:1;overflow-y:auto;position:relative;background:var(--surface2);}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;font-size:12.5px;font-weight:600;
+  cursor:pointer;transition:all 0.18s;white-space:nowrap;border:1.5px solid;}
+.btn:disabled{opacity:0.45;cursor:not-allowed;transform:none!important;}
+.btn-primary{background:var(--indigo-600);border-color:var(--indigo-600);color:#fff;box-shadow:0 2px 8px rgba(79,70,229,0.25);}
+.btn-primary:hover{background:var(--indigo-700);border-color:var(--indigo-700);box-shadow:0 4px 12px rgba(79,70,229,0.35);transform:translateY(-1px);}
+.btn-outline{background:var(--surface);border-color:var(--border2);color:var(--slate-600);}
+.btn-outline:hover{border-color:var(--indigo-400);color:var(--indigo-600);background:var(--indigo-50);}
+.btn-amber{background:var(--amber-500);border-color:var(--amber-500);color:#fff;box-shadow:0 2px 8px rgba(245,158,11,0.25);}
+.btn-amber:hover{background:var(--amber-600);border-color:var(--amber-600);transform:translateY(-1px);}
+.btn-emerald{background:var(--emerald-500);border-color:var(--emerald-500);color:#fff;box-shadow:0 2px 8px rgba(16,185,129,0.25);}
+.btn-emerald:hover{background:#059669;border-color:#059669;transform:translateY(-1px);}
+.btn-sm{padding:5px 11px;font-size:11.5px;}
+
+/* BADGES */
+.format-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:12px;font-size:11px;font-weight:600;font-family:var(--mono);white-space:nowrap;}
+.fb-indigo{background:var(--indigo-100);color:var(--indigo-700);border:1px solid var(--indigo-200);}
+.fb-amber{background:var(--amber-100);color:var(--amber-600);border:1px solid var(--amber-200);}
+.fb-emerald{background:var(--emerald-100);color:#065f46;border:1px solid var(--emerald-200);}
+.fb-slate{background:var(--slate-100);color:var(--slate-600);border:1px solid var(--slate-300);}
+.fb-rose{background:var(--rose-100);color:var(--rose-500);border:1px solid #fecdd3;}
+
+/* LEFT: SEARCH + FILTER */
+.search-in{flex:1;background:var(--surface2);border:1.5px solid var(--border2);border-radius:8px;padding:7px 12px;
+  font-family:var(--font);font-size:12px;color:var(--text);outline:none;transition:border-color 0.15s;}
+.search-in:focus{border-color:var(--indigo-400);box-shadow:0 0 0 3px rgba(99,102,241,0.12);}
+.filter-chip{padding:4px 10px;border-radius:12px;border:1.5px solid var(--border2);background:var(--surface);
+  color:var(--slate-500);font-size:11px;font-weight:600;cursor:pointer;transition:all 0.15s;}
+.filter-chip:hover{border-color:var(--indigo-300);color:var(--indigo-600);}
+.filter-chip.on{background:var(--indigo-600);border-color:var(--indigo-600);color:#fff;}
+.filter-count{font-family:var(--mono);opacity:0.75;margin-left:3px;}
+
+/* LEFT: MOCKUP LIST */
+.mk-list{padding:14px 16px;display:flex;flex-direction:column;gap:10px;}
+.mk-card{display:grid;grid-template-columns:108px 1fr;gap:14px;padding:12px;background:var(--surface);
+  border:1.5px solid var(--border);border-radius:12px;cursor:pointer;transition:all 0.18s;position:relative;}
+.mk-card:hover{border-color:var(--indigo-300);box-shadow:var(--shadow-md);transform:translateY(-1px);}
+.mk-card.active{border-color:var(--indigo-500);box-shadow:0 0 0 3px rgba(99,102,241,0.14),var(--shadow-md);}
+.mk-card.active::before{content:'';position:absolute;left:-1.5px;top:12px;bottom:12px;width:3px;border-radius:0 3px 3px 0;background:var(--indigo-600);}
+.mk-name{font-size:13.5px;font-weight:600;color:var(--text);line-height:1.3;}
+.mk-proj{font-size:11px;color:var(--slate-400);font-family:var(--mono);margin-top:2px;}
+.mk-meta{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px;}
+.mk-foot{display:flex;align-items:center;gap:8px;margin-top:8px;}
+.mk-prog{flex:1;height:5px;background:var(--indigo-50);border-radius:3px;overflow:hidden;border:1px solid var(--indigo-100);}
+.mk-prog > div{height:100%;background:linear-gradient(90deg,var(--indigo-500),var(--indigo-300));border-radius:3px;transition:width 0.3s;}
+.mk-prog.full > div{background:linear-gradient(90deg,var(--emerald-500),var(--emerald-400));}
+.mk-pct{font-size:10.5px;font-family:var(--mono);color:var(--slate-500);min-width:30px;text-align:right;}
+.mk-date{font-size:10.5px;color:var(--slate-400);font-family:var(--mono);}
+.mk-actions{position:absolute;top:10px;right:10px;display:flex;gap:4px;opacity:0;transition:opacity 0.15s;}
+.mk-card:hover .mk-actions{opacity:1;}
+.icon-btn{width:24px;height:24px;border-radius:6px;border:1.5px solid var(--border2);background:var(--surface);
+  font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--slate-500);}
+.icon-btn:hover{border-color:var(--indigo-400);color:var(--indigo-600);background:var(--indigo-50);}
+
+/* THUMBNAIL (CSS-drawn) */
+.thumb{width:108px;height:72px;border-radius:7px;border:1.5px solid var(--border);overflow:hidden;
+  display:flex;flex-direction:column;background:var(--c4,#f1f4f9);flex-shrink:0;}
+.thumb.big{width:100%;height:150px;border-radius:10px;}
+.thumb .t-head{height:9px;background:#fff;border-bottom:2px solid var(--c1);flex-shrink:0;display:flex;align-items:center;padding:0 3px;gap:2px;}
+.thumb.big .t-head{height:20px;padding:0 8px;gap:4px;}
+.thumb .t-head i{width:4px;height:4px;border-radius:1px;background:var(--c1);display:block;}
+.thumb.big .t-head i{width:9px;height:9px;border-radius:3px;}
+.thumb .t-head b{width:22px;height:3px;border-radius:2px;background:var(--c1);opacity:0.5;display:block;}
+.thumb.big .t-head b{width:60px;height:6px;}
+.thumb .t-body{flex:1;display:grid;gap:3px;padding:3px;}
+.thumb.big .t-body{gap:6px;padding:7px;}
+.thumb .t-body span{background:#fff;border-radius:2px;display:block;position:relative;overflow:hidden;}
+.thumb.big .t-body span{border-radius:5px;}
+.thumb .t-body span::after{content:'';position:absolute;left:12%;top:18%;width:60%;height:8%;background:var(--c2);opacity:0.6;border-radius:2px;
+  box-shadow:0 7px 0 rgba(148,163,184,0.35),0 14px 0 rgba(148,163,184,0.35);}
+.thumb .t-body span.acc{background:var(--c1);opacity:0.14;}
+.lay-three .t-body{grid-template-columns:1fr 1fr 0.7fr;}
+.lay-side .t-body{grid-template-columns:0.4fr 1fr;}
+.lay-single .t-body{grid-template-columns:1fr;padding-left:18%;padding-right:18%;}
+.lay-grid .t-body{grid-template-columns:1fr 1fr 1fr;grid-template-rows:1fr 1fr;}
+.thumb.dev-mobile{width:44px;margin:0 32px;}
+.thumb.big.dev-mobile{width:90px;margin:0 auto;}
+.thumb.dev-tablet{width:86px;margin:0 11px;}
+.thumb.big.dev-tablet{width:200px;margin:0 auto;}
+
+/* MIDDLE: STEPPER */
+.stepper{display:flex;align-items:flex-start;gap:0;padding:2px 0 0;}
+.st{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;position:relative;min-width:0;}
+.st::before{content:'';position:absolute;top:11px;left:calc(-50% + 13px);right:calc(50% + 13px);height:2px;background:var(--border);}
+.st:first-child::before{display:none;}
+.st.done::before,.st.cur::before{background:var(--indigo-300);}
+.st-num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;font-family:var(--mono);border:1.5px solid var(--border2);background:var(--surface);color:var(--slate-400);
+  position:relative;z-index:1;transition:all 0.18s;}
+.st:hover .st-num{border-color:var(--indigo-400);color:var(--indigo-600);}
+.st.done .st-num{background:var(--emerald-100);border-color:var(--emerald-400);color:#065f46;}
+.st.cur .st-num{background:var(--indigo-600);border-color:var(--indigo-600);color:#fff;box-shadow:0 0 0 4px rgba(99,102,241,0.15);}
+.st-lbl{font-size:10.5px;font-weight:600;color:var(--slate-400);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+.st.cur .st-lbl{color:var(--indigo-700);}
+.st.done .st-lbl{color:var(--slate-600);}
+
+/* MIDDLE: WIZARD BODY */
+.wz{padding:20px 22px 28px;}
+.wz-step{display:none;animation:fade 0.25s ease;}
+.wz-step.on{display:block;}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.wz-head{margin-bottom:18px;}
+.wz-kicker{font-size:10.5px;font-family:var(--mono);color:var(--indigo-500);font-weight:600;letter-spacing:0.6px;}
+.wz-title{font-size:20px;font-weight:700;color:var(--text);margin-top:3px;letter-spacing:-0.2px;}
+.wz-sub{font-size:12.5px;color:var(--slate-500);margin-top:4px;line-height:1.6;}
+.q{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:12px;}
+.q-lbl{font-size:13px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:6px;}
+.q-req{color:var(--rose-500);font-size:12px;}
+.q-hint{font-size:11.5px;color:var(--slate-400);margin:3px 0 10px;line-height:1.5;}
+.q-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.inp,.sel,.ta{width:100%;background:var(--surface2);border:1.5px solid var(--border2);border-radius:8px;padding:8px 12px;
+  font-family:var(--font);font-size:12.5px;color:var(--text);outline:none;transition:border-color 0.15s,box-shadow 0.15s;}
+.inp:focus,.sel:focus,.ta:focus{border-color:var(--indigo-400);box-shadow:0 0 0 3px rgba(99,102,241,0.12);}
+.ta{resize:vertical;min-height:64px;line-height:1.6;}
+.inp::placeholder,.ta::placeholder{color:var(--text-faint);}
+.sel{appearance:none;cursor:pointer;background-image:linear-gradient(45deg,transparent 50%,var(--indigo-400) 50%),linear-gradient(135deg,var(--indigo-400) 50%,transparent 50%);
+  background-position:calc(100% - 15px) 52%,calc(100% - 10px) 52%;background-size:5px 5px;background-repeat:no-repeat;padding-right:30px;}
+
+.opts{display:grid;gap:8px;}
+.opts.c2{grid-template-columns:1fr 1fr;}
+.opts.c3{grid-template-columns:1fr 1fr 1fr;}
+.opts.c4{grid-template-columns:repeat(4,1fr);}
+.opt{border:1.5px solid var(--border2);background:var(--surface2);border-radius:10px;padding:10px 11px;cursor:pointer;
+  transition:all 0.15s;display:flex;flex-direction:column;gap:3px;position:relative;text-align:left;}
+.opt:hover{border-color:var(--indigo-300);background:var(--indigo-50);}
+.opt.sel-on{border-color:var(--indigo-500);background:var(--indigo-50);box-shadow:0 0 0 3px rgba(99,102,241,0.12);}
+.opt.sel-on::after{content:'✓';position:absolute;top:7px;right:9px;width:16px;height:16px;border-radius:50%;background:var(--indigo-600);
+  color:#fff;font-size:9px;display:flex;align-items:center;justify-content:center;font-weight:700;}
+.opt-ic{font-size:18px;}
+.opt-t{font-size:12.5px;font-weight:600;color:var(--text);}
+.opt-d{font-size:10.5px;color:var(--slate-400);font-family:var(--mono);}
+.chips{display:flex;flex-wrap:wrap;gap:6px;}
+.chip{padding:6px 12px;border-radius:16px;border:1.5px solid var(--border2);background:var(--surface);color:var(--slate-600);
+  font-size:12px;font-weight:500;cursor:pointer;transition:all 0.15s;}
+.chip:hover{border-color:var(--indigo-300);color:var(--indigo-600);}
+.chip.sel-on{background:var(--indigo-600);border-color:var(--indigo-600);color:#fff;}
+.chip.sel-on::before{content:'✓ ';}
+
+.lay-mini{height:38px;border-radius:5px;background:var(--slate-100);display:grid;gap:3px;padding:4px;margin-bottom:5px;border:1px solid var(--border);}
+.lay-mini i{background:#fff;border-radius:2px;border:1px solid var(--indigo-100);}
+.lay-mini.three{grid-template-columns:1fr 1fr 0.7fr;}
+.lay-mini.side{grid-template-columns:0.4fr 1fr;}
+.lay-mini.single{grid-template-columns:1fr;padding-left:22%;padding-right:22%;}
+.lay-mini.grid{grid-template-columns:1fr 1fr 1fr;grid-template-rows:1fr 1fr;}
+.swatches{display:flex;gap:0;height:26px;border-radius:6px;overflow:hidden;margin-bottom:6px;border:1px solid var(--border);}
+.swatches i{flex:1;}
+.range-row{display:flex;align-items:center;gap:12px;}
+.range-row input[type=range]{flex:1;accent-color:var(--indigo-600);}
+.range-val{font-family:var(--mono);font-size:12px;color:var(--indigo-600);font-weight:600;min-width:38px;}
+.ref-list{display:flex;flex-direction:column;gap:6px;margin-top:8px;}
+.ref-item{display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--indigo-50);border:1px solid var(--indigo-100);
+  border-radius:8px;font-size:11.5px;font-family:var(--mono);color:var(--indigo-700);}
+.ref-item span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.drop-zone{border:2px dashed var(--indigo-200);border-radius:12px;padding:16px;text-align:center;cursor:pointer;transition:all 0.2s;background:var(--indigo-50);}
+.drop-zone:hover{border-color:var(--indigo-400);background:var(--indigo-100);}
+.drop-zone-label{font-size:12px;color:var(--indigo-600);font-weight:600;}
+.drop-zone-sub{font-size:11px;color:var(--slate-400);margin-top:4px;}
+
+/* REVIEW */
+.rv-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.rv-table{width:100%;border-collapse:collapse;font-size:12px;}
+.rv-table td{padding:7px 4px;border-bottom:1px solid var(--slate-100);vertical-align:top;}
+.rv-table td:first-child{color:var(--slate-400);width:92px;font-weight:500;}
+.rv-table td:last-child{color:var(--slate-700);}
+.rv-table tr:last-child td{border-bottom:none;}
+.rv-edit{font-size:10.5px;color:var(--indigo-500);cursor:pointer;font-weight:600;margin-left:6px;}
+.rv-edit:hover{text-decoration:underline;}
+.miss{color:var(--rose-500);font-style:italic;}
+.check-list{display:flex;flex-direction:column;gap:7px;}
+.ck{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--slate-600);}
+.ck-ic{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;}
+.ck.ok .ck-ic{background:var(--emerald-100);color:#065f46;}
+.ck.no .ck-ic{background:var(--rose-100);color:var(--rose-500);}
+.gen-box{background:linear-gradient(135deg,var(--indigo-50),var(--surface));border:1.5px solid var(--indigo-200);border-radius:12px;
+  padding:16px;display:flex;align-items:center;gap:14px;}
+.gen-box .t{font-size:13.5px;font-weight:700;color:var(--indigo-800);}
+.gen-box .d{font-size:11.5px;color:var(--slate-500);margin-top:2px;}
+
+/* STRIP */
+.validation-strip{border-top:1.5px solid var(--border);padding:6px 16px;display:flex;gap:10px;align-items:center;
+  background:var(--surface);flex-shrink:0;font-size:11.5px;min-height:34px;}
+.vr-item{display:flex;align-items:center;gap:5px;font-family:var(--mono);}
+.vr-dot{width:7px;height:7px;border-radius:50%;}
+.vr-ok{color:var(--emerald-500);} .vr-ok .vr-dot{background:var(--emerald-500);}
+.vr-warn{color:var(--amber-500);} .vr-warn .vr-dot{background:var(--amber-400);}
+.vr-err{color:var(--rose-500);} .vr-err .vr-dot{background:var(--rose-400);}
+.vr-info{color:var(--slate-400);margin-left:auto;font-family:var(--mono);}
+.wz-nav{border-top:1.5px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:10px;background:var(--surface);flex-shrink:0;}
+.wz-progress{flex:1;display:flex;flex-direction:column;gap:4px;}
+.wz-progress-bar{height:6px;background:var(--indigo-50);border-radius:3px;overflow:hidden;border:1px solid var(--indigo-100);}
+.wz-progress-bar > div{height:100%;background:linear-gradient(90deg,var(--indigo-500),var(--amber-400));transition:width 0.3s;}
+.wz-progress-txt{font-size:10.5px;font-family:var(--mono);color:var(--slate-500);}
+
+/* CHAT */
+.chat-panel{display:flex;flex-direction:column;background:var(--surface);overflow:hidden;}
+.chat-topbar{padding:10px 16px 8px;border-bottom:1.5px solid var(--border);background:linear-gradient(135deg,var(--indigo-50),var(--surface));flex-shrink:0;}
+.chat-topbar-title{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.chat-ai-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--indigo-500),var(--indigo-300));
+  display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;box-shadow:0 2px 8px rgba(99,102,241,0.3);}
+.chat-ai-name{font-size:13px;font-weight:700;color:var(--text);line-height:1.2;}
+.chat-ai-sub{font-size:10px;color:var(--text-muted);font-family:var(--mono);margin-top:1px;}
+.file-upload-row{display:flex;align-items:center;gap:6px;padding:6px 0 2px;}
+.upload-btn{display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:7px;border:1.5px dashed var(--indigo-300);
+  background:var(--indigo-50);color:var(--indigo-600);font-size:11px;font-weight:600;cursor:pointer;transition:all 0.15s;width:100%;justify-content:center;}
+.upload-btn:hover{border-color:var(--indigo-500);background:var(--indigo-100);}
+.chat-action-strip{display:flex;gap:6px;}
+.chat-action-btn{flex:1;padding:6px 6px;border-radius:7px;border:1.5px solid var(--border2);background:var(--surface);color:var(--slate-600);
+  font-size:10.5px;font-weight:600;text-align:center;cursor:pointer;transition:all 0.18s;line-height:1.3;}
+.chat-action-btn:hover{border-color:var(--indigo-400);color:var(--indigo-700);background:var(--indigo-50);transform:translateY(-1px);}
+.chat-action-btn .icon{display:block;font-size:14px;margin-bottom:2px;}
+.chat-messages{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:11px;}
+.msg{display:flex;gap:7px;align-items:flex-start;}
+.msg.user{flex-direction:row-reverse;}
+.msg-av{width:26px;height:26px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;}
+.msg.ai .msg-av{background:linear-gradient(135deg,var(--indigo-500),var(--indigo-300));}
+.msg.user .msg-av{background:var(--slate-100);border:1.5px solid var(--border);}
+.bubble{max-width:85%;padding:9px 12px;border-radius:12px;font-size:12.5px;line-height:1.65;}
+.msg.ai .bubble{background:var(--surface2);border:1.5px solid var(--border);color:var(--slate-700);border-top-left-radius:4px;}
+.msg.user .bubble{background:var(--indigo-600);color:#fff;border-top-right-radius:4px;}
+.bubble strong{font-weight:600;}
+.bubble code{font-family:var(--mono);font-size:11px;background:var(--indigo-100);color:var(--indigo-700);padding:1px 5px;border-radius:4px;}
+.bubble .tag{display:inline-block;padding:1px 6px;border-radius:4px;background:var(--indigo-100);color:var(--indigo-700);font-family:var(--mono);font-size:10px;font-weight:600;}
+.bubble .apply{display:inline-block;margin-top:6px;padding:3px 10px;border-radius:6px;background:var(--indigo-600);color:#fff;font-size:11px;font-weight:600;cursor:pointer;}
+.bubble .apply:hover{background:var(--indigo-700);}
+.msg-time{font-size:9.5px;color:var(--text-faint);margin-top:3px;}
+.msg.user .msg-time{text-align:right;}
+.typing{display:flex;gap:7px;align-items:flex-start;}
+.typing-dots{background:var(--surface2);border:1.5px solid var(--border);border-radius:12px;border-top-left-radius:4px;padding:10px 14px;display:flex;gap:4px;align-items:center;}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--indigo-300);animation:tdot 1.2s infinite;}
+.dot:nth-child(2){animation-delay:0.2s;} .dot:nth-child(3){animation-delay:0.4s;}
+@keyframes tdot{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+.chat-footer{padding:10px 14px 14px;border-top:1.5px solid var(--border);flex-shrink:0;background:var(--surface);}
+.chat-row{display:flex;gap:7px;align-items:flex-end;}
+.chat-in{flex:1;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:8px 12px;font-family:var(--font);
+  font-size:12.5px;color:var(--text);resize:none;outline:none;transition:border-color 0.15s,box-shadow 0.15s;line-height:1.5;max-height:100px;overflow-y:auto;}
+.chat-in:focus{border-color:var(--indigo-400);box-shadow:0 0 0 3px rgba(99,102,241,0.12);}
+.chat-in::placeholder{color:var(--text-faint);}
+.send-btn{width:34px;height:34px;border-radius:9px;background:var(--indigo-600);border:none;color:#fff;font-size:15px;cursor:pointer;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
+.send-btn:hover{background:var(--indigo-700);transform:scale(1.05);}
+.chat-hint{font-size:9.5px;color:var(--text-faint);text-align:center;margin-top:6px;}
+
+/* EMPTY */
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--text-faint);padding:40px 24px;}
+.empty-icon{font-size:36px;opacity:0.5;}
+.empty-title{font-size:14px;font-weight:600;color:var(--slate-400);}
+.empty-sub{font-size:12px;color:var(--slate-400);text-align:center;line-height:1.5;}
+
+/* TOAST */
+.toast-container{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:999;display:flex;flex-direction:column;gap:8px;pointer-events:none;}
+.toast{padding:10px 18px;border-radius:10px;font-size:12.5px;font-weight:500;box-shadow:var(--shadow-lg);animation:toast-in 0.3s ease;}
+.toast-success{background:var(--emerald-500);color:#fff;}
+.toast-info{background:var(--indigo-600);color:#fff;}
+.toast-warn{background:var(--amber-500);color:#fff;}
+@keyframes toast-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:var(--surface2);}
+::-webkit-scrollbar-thumb{background:var(--indigo-200);border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:var(--indigo-300);}
+.spinner{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;animation:spin 0.7s linear infinite;display:none;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+:root{--font:'Outfit','Noto Sans','Noto Sans SC',system-ui,sans-serif;--mono:'Source Code Pro','Noto Sans','Noto Sans SC',monospace;}
+/* LANGUAGE SWITCH */
+.lang-switch{display:flex;background:var(--indigo-50);border:1.5px solid var(--indigo-100);border-radius:10px;padding:3px;gap:2px;}
+.lang-btn{display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:7px;border:none;background:transparent;
+  color:var(--slate-500);font-size:12px;font-weight:600;cursor:pointer;transition:all 0.15s;}
+.lang-btn:hover{color:var(--indigo-600);background:rgba(255,255,255,0.7);}
+.lang-btn.on{background:var(--surface);color:var(--indigo-700);box-shadow:var(--shadow-sm);}
+.lang-btn .code{font-family:'Source Code Pro',monospace;font-size:9.5px;padding:1px 4px;border-radius:4px;background:var(--indigo-100);color:var(--indigo-600);}
+.lang-btn.on .code{background:var(--indigo-600);color:#fff;}
+.header-divider{width:1.5px;height:24px;background:var(--border);}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-logo">
+    <div class="logo-icon">&#127912;</div>
+    <span class="logo-name">Mockup Builder</span>
+    <span class="logo-version">v1.1</span>
+  </div>
+  <div class="header-sep"></div>
+  <div class="lang-switch" id="lang-switch" data-i18n-title="lang.label">
+    <button class="lang-btn" data-lang="zh" onclick="setLang('zh')"><span class="code">ZH</span>中文</button>
+    <button class="lang-btn" data-lang="kk" onclick="setLang('kk')"><span class="code">KK</span>Қазақша</button>
+    <button class="lang-btn" data-lang="es" onclick="setLang('es')"><span class="code">ES</span>Español</button>
+  </div>
+  <div class="header-divider"></div>
+  <div class="header-status">
+    <div class="status-dot"></div>
+    <span id="hdr-status" data-i18n="app.status"></span>
+  </div>
+</header>
+
+<div class="workspace">
+
+  <!-- PANEL 1 -->
+  <div class="panel">
+    <div class="panel-toolbar">
+      <div class="panel-toolbar-row">
+        <span class="panel-label">Mockups</span>
+        <span class="panel-title" data-i18n="list.title"></span>
+        <button class="btn btn-primary btn-sm" onclick="newMockup()" data-i18n="list.new"></button>
+      </div>
+      <div class="panel-toolbar-row">
+        <input class="search-in" id="search" data-i18n-ph="list.search" oninput="renderList()">
+      </div>
+      <div class="panel-toolbar-row" id="filters"></div>
+    </div>
+    <div class="panel-body"><div class="mk-list" id="mk-list"></div></div>
+    <div class="validation-strip">
+      <div class="vr-item vr-ok"><div class="vr-dot"></div><span id="ls-done"></span></div>
+      <div class="vr-item vr-warn"><div class="vr-dot"></div><span id="ls-review"></span></div>
+      <div class="vr-item vr-err"><div class="vr-dot"></div><span id="ls-draft"></span></div>
+      <span class="vr-info" id="ls-total"></span>
+    </div>
+  </div>
+
+  <!-- PANEL 2 -->
+  <div class="panel" id="wz-panel">
+    <div class="panel-toolbar">
+      <div class="panel-toolbar-row">
+        <span class="panel-label">Wizard</span>
+        <span class="panel-title" id="wz-title"></span>
+        <span id="wz-badge" class="format-badge fb-slate"></span>
+        <button class="btn btn-outline btn-sm" onclick="saveDraft()" data-i18n="wz.save"></button>
+      </div>
+      <div class="stepper" id="stepper"></div>
+    </div>
+
+    <div class="panel-body" id="wz-body">
+      <div class="wz">
+
+        <section class="wz-step" data-step="1">
+          <div class="wz-head"><div class="wz-kicker">STEP 01 / 07</div><div class="wz-title" data-i18n="step.1"></div><div class="wz-sub" data-i18n="s1.sub"></div></div>
+          <div class="q"><div class="q-row">
+            <div><div class="q-lbl"><span data-i18n="q.name"></span> <span class="q-req">*</span></div><div class="q-hint" data-i18n="q.name.h"></div>
+              <input class="inp" data-f="name" data-i18n-ph="q.name.ph"></div>
+            <div><div class="q-lbl" data-i18n="q.project"></div><div class="q-hint" data-i18n="q.project.h"></div>
+              <input class="inp" data-f="project" data-i18n-ph="q.project.ph"></div>
+          </div></div>
+          <div class="q">
+            <div class="q-lbl"><span data-i18n="q.type"></span> <span class="q-req">*</span></div><div class="q-hint" data-i18n="q.type.h"></div>
+            <div class="opts c4" data-group="type">
+              <div class="opt" data-v="web"><span class="opt-ic">&#128421;</span><span class="opt-t" data-i18n="type.web"></span><span class="opt-d" data-i18n="type.web.d"></span></div>
+              <div class="opt" data-v="dash"><span class="opt-ic">&#128202;</span><span class="opt-t" data-i18n="type.dash"></span><span class="opt-d" data-i18n="type.dash.d"></span></div>
+              <div class="opt" data-v="mobile"><span class="opt-ic">&#128241;</span><span class="opt-t" data-i18n="type.mobile"></span><span class="opt-d">iOS / Android</span></div>
+              <div class="opt" data-v="landing"><span class="opt-ic">&#127760;</span><span class="opt-t" data-i18n="type.landing"></span><span class="opt-d" data-i18n="type.landing.d"></span></div>
+            </div>
+          </div>
+          <div class="q"><div class="q-lbl" data-i18n="q.desc"></div><div class="q-hint" data-i18n="q.desc.h"></div>
+            <textarea class="ta" data-f="desc" data-i18n-ph="q.desc.ph"></textarea></div>
+        </section>
+
+        <section class="wz-step" data-step="2">
+          <div class="wz-head"><div class="wz-kicker">STEP 02 / 07</div><div class="wz-title" data-i18n="step.2"></div><div class="wz-sub" data-i18n="s2.sub"></div></div>
+          <div class="q"><div class="q-lbl"><span data-i18n="q.goal"></span> <span class="q-req">*</span></div><div class="q-hint" data-i18n="q.goal.h"></div>
+            <textarea class="ta" data-f="goal" data-i18n-ph="q.goal.ph"></textarea></div>
+          <div class="q"><div class="q-lbl"><span data-i18n="q.users"></span> <span class="q-req">*</span></div><div class="q-hint" data-i18n="q.multi"></div>
+            <div class="chips" data-group="users" data-multi="1" data-prefix="u"></div></div>
+          <div class="q"><div class="q-row">
+            <div><div class="q-lbl" data-i18n="q.level"></div><div class="q-hint" data-i18n="q.level.h"></div>
+              <select class="sel" data-f="level"><option value="novice" data-i18n="level.novice"></option><option value="mid" data-i18n="level.mid"></option><option value="expert" data-i18n="level.expert"></option></select></div>
+            <div><div class="q-lbl" data-i18n="q.success"></div><div class="q-hint" data-i18n="q.success.h"></div>
+              <input class="inp" data-f="success" data-i18n-ph="q.success.ph"></div>
+          </div></div>
+        </section>
+
+        <section class="wz-step" data-step="3">
+          <div class="wz-head"><div class="wz-kicker">STEP 03 / 07</div><div class="wz-title" data-i18n="step.3"></div><div class="wz-sub" data-i18n="s3.sub"></div></div>
+          <div class="q"><div class="q-lbl"><span data-i18n="q.device"></span> <span class="q-req">*</span></div><div class="q-hint" data-i18n="q.device.h"></div>
+            <div class="opts c3" data-group="device">
+              <div class="opt" data-v="desktop"><span class="opt-ic">&#128421;</span><span class="opt-t" data-i18n="dev.desktop"></span><span class="opt-d">1440 × 900</span></div>
+              <div class="opt" data-v="tablet"><span class="opt-ic">&#128203;</span><span class="opt-t" data-i18n="dev.tablet"></span><span class="opt-d">1024 × 768</span></div>
+              <div class="opt" data-v="mobile"><span class="opt-ic">&#128241;</span><span class="opt-t" data-i18n="dev.mobile"></span><span class="opt-d">390 × 844</span></div>
+            </div></div>
+          <div class="q"><div class="q-lbl"><span data-i18n="q.layout"></span> <span class="q-req">*</span></div><div class="q-hint" data-i18n="q.layout.h"></div>
+            <div class="opts c4" data-group="layout">
+              <div class="opt" data-v="three"><div class="lay-mini three"><i></i><i></i><i></i></div><span class="opt-t" data-i18n="lay.three"></span><span class="opt-d">1fr 1fr 360px</span></div>
+              <div class="opt" data-v="side"><div class="lay-mini side"><i></i><i></i></div><span class="opt-t" data-i18n="lay.side"></span><span class="opt-d">240px 1fr</span></div>
+              <div class="opt" data-v="single"><div class="lay-mini single"><i></i></div><span class="opt-t" data-i18n="lay.single"></span><span class="opt-d" data-i18n="lay.single.d"></span></div>
+              <div class="opt" data-v="grid"><div class="lay-mini grid"><i></i><i></i><i></i><i></i><i></i><i></i></div><span class="opt-t" data-i18n="lay.grid"></span><span class="opt-d">3 × N</span></div>
+            </div></div>
+          <div class="q"><div class="q-row">
+            <div><div class="q-lbl" data-i18n="q.screens"></div><div class="q-hint" data-i18n="q.screens.h"></div>
+              <input class="inp" type="number" min="1" max="20" data-f="screens"></div>
+            <div><div class="q-lbl" data-i18n="q.nav"></div><div class="q-hint" data-i18n="q.nav.h"></div>
+              <select class="sel" data-f="nav"><option value="top" data-i18n="nav.top"></option><option value="side" data-i18n="nav.side"></option><option value="tabs" data-i18n="nav.tabs"></option><option value="bottom" data-i18n="nav.bottom"></option><option value="none" data-i18n="nav.none"></option></select></div>
+          </div></div>
+        </section>
+
+        <section class="wz-step" data-step="4">
+          <div class="wz-head"><div class="wz-kicker">STEP 04 / 07</div><div class="wz-title" data-i18n="step.4"></div><div class="wz-sub" data-i18n="s4.sub"></div></div>
+          <div class="q"><div class="q-lbl"><span data-i18n="q.palette"></span> <span class="q-req">*</span></div><div class="q-hint" data-i18n="q.palette.h"></div>
+            <div class="opts c4" data-group="palette">
+              <div class="opt" data-v="indigo"><div class="swatches"><i style="background:#4f46e5"></i><i style="background:#fbbf24"></i><i style="background:#10b981"></i><i style="background:#f1f4f9"></i></div><span class="opt-t" data-i18n="pal.indigo"></span><span class="opt-d" data-i18n="pal.indigo.d"></span></div>
+              <div class="opt" data-v="corp"><div class="swatches"><i style="background:#1e3a8a"></i><i style="background:#0ea5e9"></i><i style="background:#64748b"></i><i style="background:#f8fafc"></i></div><span class="opt-t" data-i18n="pal.corp"></span><span class="opt-d" data-i18n="pal.corp.d"></span></div>
+              <div class="opt" data-v="dark"><div class="swatches"><i style="background:#0f172a"></i><i style="background:#818cf8"></i><i style="background:#a78bfa"></i><i style="background:#1e293b"></i></div><span class="opt-t" data-i18n="pal.dark"></span><span class="opt-d" data-i18n="pal.dark.d"></span></div>
+              <div class="opt" data-v="teal"><div class="swatches"><i style="background:#0f766e"></i><i style="background:#14b8a6"></i><i style="background:#fb7185"></i><i style="background:#f0fdfa"></i></div><span class="opt-t" data-i18n="pal.teal"></span><span class="opt-d" data-i18n="pal.teal.d"></span></div>
+            </div></div>
+          <div class="q"><div class="q-row">
+            <div><div class="q-lbl" data-i18n="q.font"></div><div class="q-hint" data-i18n="q.font.h"></div>
+              <select class="sel" data-f="font"><option>Outfit + Source Code Pro</option><option>Inter + JetBrains Mono</option><option>Noto Sans + Source Code Pro</option><option>IBM Plex Sans + IBM Plex Mono</option></select></div>
+            <div><div class="q-lbl" data-i18n="q.radius"></div><div class="q-hint" data-i18n="q.radius.h"></div>
+              <div class="range-row"><input type="range" min="0" max="20" data-f="radius"><span class="range-val" id="radius-val">12px</span></div></div>
+          </div></div>
+          <div class="q"><div class="q-lbl" data-i18n="q.refs"></div><div class="q-hint" data-i18n="q.refs.h"></div>
+            <div class="drop-zone" onclick="triggerRefInput()"><div class="drop-zone-label" data-i18n="drop.label"></div><div class="drop-zone-sub">.png &bull; .jpg &bull; .html &bull; .pdf &bull; .fig</div></div>
+            <div class="ref-list" id="ref-list"></div></div>
+        </section>
+
+        <section class="wz-step" data-step="5">
+          <div class="wz-head"><div class="wz-kicker">STEP 05 / 07</div><div class="wz-title" data-i18n="step.5"></div><div class="wz-sub" data-i18n="s5.sub"></div></div>
+          <div class="q"><div class="q-lbl"><span data-i18n="q.components"></span> <span class="q-req">*</span></div><div class="q-hint" data-i18n="q.components.h"></div>
+            <div class="chips" data-group="components" data-multi="1" data-prefix="c"></div></div>
+          <div class="q"><div class="q-lbl"><span data-i18n="q.interaction"></span> <span class="q-req">*</span></div><div class="q-hint" data-i18n="q.interaction.h"></div>
+            <div class="opts c3" data-group="interaction">
+              <div class="opt" data-v="static"><span class="opt-ic">&#128444;</span><span class="opt-t" data-i18n="int.static"></span><span class="opt-d" data-i18n="int.static.d"></span></div>
+              <div class="opt" data-v="click"><span class="opt-ic">&#128070;</span><span class="opt-t" data-i18n="int.click"></span><span class="opt-d" data-i18n="int.click.d"></span></div>
+              <div class="opt" data-v="full"><span class="opt-ic">&#9889;</span><span class="opt-t" data-i18n="int.full"></span><span class="opt-d" data-i18n="int.full.d"></span></div>
+            </div></div>
+          <div class="q"><div class="q-lbl" data-i18n="q.flow"></div><div class="q-hint" data-i18n="q.flow.h"></div>
+            <textarea class="ta" data-f="flow" data-i18n-ph="q.flow.ph"></textarea></div>
+        </section>
+
+        <section class="wz-step" data-step="6">
+          <div class="wz-head"><div class="wz-kicker">STEP 06 / 07</div><div class="wz-title" data-i18n="step.6"></div><div class="wz-sub" data-i18n="s6.sub"></div></div>
+          <div class="q"><div class="q-lbl"><span data-i18n="q.data"></span> <span class="q-req">*</span></div><div class="q-hint" data-i18n="q.data.h"></div>
+            <div class="opts c3" data-group="dataSource">
+              <div class="opt" data-v="fake"><span class="opt-ic">&#127922;</span><span class="opt-t" data-i18n="ds.fake"></span><span class="opt-d" data-i18n="ds.fake.d"></span></div>
+              <div class="opt" data-v="user"><span class="opt-ic">&#128228;</span><span class="opt-t" data-i18n="ds.user"></span><span class="opt-d" data-i18n="ds.user.d"></span></div>
+              <div class="opt" data-v="anon"><span class="opt-ic">&#128274;</span><span class="opt-t" data-i18n="ds.anon"></span><span class="opt-d" data-i18n="ds.anon.d"></span></div>
+            </div></div>
+          <div class="q"><div class="q-row">
+            <div><div class="q-lbl" data-i18n="q.lang"></div><div class="q-hint" data-i18n="q.lang.h"></div>
+              <select class="sel" data-f="lang"><option value="zh">中文</option><option value="kk">Қазақша</option><option value="es">Español</option><option value="en">English</option><option value="ru">Русский</option><option value="fr">Français</option></select></div>
+            <div><div class="q-lbl" data-i18n="q.terms"></div><div class="q-hint" data-i18n="q.terms.h"></div>
+              <select class="sel" data-f="terms"><option value="S1000D">S1000D</option><option value="iSpec 2200">ATA iSpec 2200</option><option value="DITA">DITA</option><option value="ASD-STE100">ASD-STE100</option><option value="none" data-i18n="terms.none"></option></select></div>
+          </div></div>
+          <div class="q"><div class="q-lbl" data-i18n="q.labels"></div><div class="q-hint" data-i18n="q.labels.h"></div>
+            <textarea class="ta" data-f="labels" placeholder="Tech Pubs Converter&#10;Convert&#10;Apply BREX Validation"></textarea></div>
+        </section>
+
+        <section class="wz-step" data-step="7">
+          <div class="wz-head"><div class="wz-kicker">STEP 07 / 07</div><div class="wz-title" data-i18n="step.7"></div><div class="wz-sub" data-i18n="s7.sub"></div></div>
+          <div class="rv-grid">
+            <div class="q" style="margin:0"><div class="q-lbl" style="margin-bottom:10px" data-i18n="rv.preview"></div><div id="rv-thumb"></div>
+              <div style="margin-top:10px;display:flex;gap:5px;flex-wrap:wrap" id="rv-badges"></div></div>
+            <div class="q" style="margin:0"><div class="q-lbl" style="margin-bottom:10px" data-i18n="rv.checks"></div><div class="check-list" id="rv-checks"></div></div>
+          </div>
+          <div class="q"><div class="q-lbl" style="margin-bottom:6px" data-i18n="rv.summary"></div><table class="rv-table" id="rv-table"></table></div>
+          <div class="gen-box">
+            <div style="font-size:28px">&#10024;</div>
+            <div style="flex:1"><div class="t" data-i18n="gen.title"></div><div class="d" id="gen-desc"></div></div>
+            <button class="btn btn-emerald" id="gen-btn" onclick="generate()"><div class="spinner" id="gen-spin"></div><span data-i18n="gen.btn"></span></button>
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+    <div class="wz-nav">
+      <button class="btn btn-outline btn-sm" id="prev-btn" onclick="goStep(step-1,true)" data-i18n="wz.prev"></button>
+      <div class="wz-progress">
+        <div class="wz-progress-bar"><div id="wz-bar" style="width:0%"></div></div>
+        <div class="wz-progress-txt" id="wz-ptxt"></div>
+      </div>
+      <button class="btn btn-primary btn-sm" id="next-btn" onclick="goStep(step+1,true)" data-i18n="wz.next"></button>
+    </div>
+  </div>
+
+  <!-- PANEL 3 -->
+  <div class="chat-panel">
+    <div class="chat-topbar">
+      <div class="chat-topbar-title">
+        <div class="chat-ai-avatar">&#129302;</div>
+        <div><div class="chat-ai-name" data-i18n="chat.name"></div><div class="chat-ai-sub">@Claude &bull; UX &bull; UI &bull; HTML</div></div>
+      </div>
+      <div class="file-upload-row">
+        <button class="upload-btn" onclick="triggerRefInput()" data-i18n="chat.upload"></button>
+        <input type="file" id="ref-input" style="display:none" multiple accept=".png,.jpg,.jpeg,.html,.htm,.pdf,.fig" onchange="handleRefs(this)">
+      </div>
+      <div class="panel-toolbar-row" style="margin-top:6px"><button class="btn btn-outline btn-sm" onclick="autofillFromRef()" style="flex:1;justify-content:center" data-i18n="chat.autofill"></button></div>
+      <div class="panel-toolbar-row" style="margin-top:4px"><button class="btn btn-amber btn-sm" onclick="runUXCheck()" style="flex:1;justify-content:center" data-i18n="chat.ux"></button></div>
+      <div class="chat-action-strip" style="margin-top:8px">
+        <button class="chat-action-btn" onclick="chatAction('explain')"><span class="icon">&#128269;</span><span data-i18n="qa.explain"></span></button>
+        <button class="chat-action-btn" onclick="chatAction('suggest')"><span class="icon">&#128161;</span><span data-i18n="qa.suggest"></span></button>
+        <button class="chat-action-btn" onclick="chatAction('check')"><span class="icon">&#9989;</span><span data-i18n="qa.check"></span></button>
+        <button class="chat-action-btn" onclick="chatAction('spec')"><span class="icon">&#128203;</span><span data-i18n="qa.spec"></span></button>
+      </div>
+    </div>
+    <div class="chat-messages" id="chat-msgs"></div>
+    <div class="chat-footer">
+      <div class="chat-row">
+        <textarea class="chat-in" id="chat-in" rows="1" data-i18n-ph="chat.ph"></textarea>
+        <button class="send-btn" onclick="sendMsg()" data-i18n-title="chat.send">&#10148;</button>
+      </div>
+      <div class="chat-hint" data-i18n="chat.hint"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toasts"></div>
+
+<script>
+/* =====================================================
+   I18N  —  [中文, Қазақша, Español]
+===================================================== */
+var LANGS = ['zh','kk','es'];
+var HTML_LANG = {zh:'zh-CN',kk:'kk',es:'es'};
+var D = {
+'app.status':['原型引擎就绪','Прототип қозғалтқышы дайын','Motor de mockups listo'],
+'app.generating':['正在生成原型…','Прототип жасалуда…','Generando mockup…'],
+'lang.label':['界面语言','Интерфейс тілі','Idioma de la interfaz'],
+'lang.toast':['界面语言已切换为中文','Интерфейс тілі қазақшаға ауыстырылды','Idioma cambiado a español'],
+
+'list.title':['我的原型','Менің прототиптерім','Mis mockups'],
+'list.new':['&#10010; 新建原型','&#10010; Жаңа прототип','&#10010; Nuevo mockup'],
+'list.search':['🔍 搜索原型名称或项目…','🔍 Атауы немесе жоба бойынша іздеу…','🔍 Buscar por nombre o proyecto…'],
+'list.empty.t':['没有匹配的原型','Сәйкес прототип жоқ','Ningún mockup coincide'],
+'list.empty.s':['尝试其他关键词，或新建一个原型','Басқа кілт сөзді қолданып көріңіз немесе жаңа прототип жасаңыз','Prueba otra palabra o crea un mockup nuevo'],
+'f.all':['全部','Барлығы','Todos'],
+'st.draft':['草稿','Нобай','Borrador'],
+'st.wip':['进行中','Орындалуда','En curso'],
+'st.review':['审核中','Тексеруде','En revisión'],
+'st.done':['已完成','Аяқталды','Completado'],
+'st.new':['新建','Жаңа','Nuevo'],
+'ls.done':['{n} 已完成','{n} аяқталды','{n} completados'],
+'ls.review':['{n} 审核中','{n} тексеруде','{n} en revisión'],
+'ls.draft':['{n} 草稿 / 进行中','{n} нобай / орындалуда','{n} borrador / en curso'],
+'ls.total':['{n} 个原型','{n} прототип','{n} mockups'],
+'untitled':['未命名原型','Атаусыз прототип','Mockup sin nombre'],
+'copy.suffix':['(副本)','(көшірме)','(copia)'],
+'act.dup':['复制','Көшіру','Duplicar'],
+'act.del':['删除','Жою','Eliminar'],
+
+'wz.title':['原型向导 · {name}','Прототип шебері · {name}','Asistente · {name}'],
+'wz.save':['&#128190; 保存草稿','&#128190; Нобайды сақтау','&#128190; Guardar borrador'],
+'wz.prev':['&#8592; 上一步','&#8592; Артқа','&#8592; Anterior'],
+'wz.next':['下一步 &#8594;','Келесі &#8594;','Siguiente &#8594;'],
+'wz.progress':['第 {s} / 7 步 · 必填项 {n} / {t} · {p}%','{s}/7 қадам · міндетті {n}/{t} · {p}%','Paso {s}/7 · obligatorios {n}/{t} · {p}%'],
+
+'step.1':['基本信息','Негізгі ақпарат','Información básica'],
+'step.2':['目标与用户','Мақсат пен пайдаланушылар','Objetivo y usuarios'],
+'step.3':['屏幕与布局','Экран және макет','Pantalla y layout'],
+'step.4':['视觉风格','Визуалды стиль','Estilo visual'],
+'step.5':['组件与交互','Компоненттер мен интерактив','Componentes e interacción'],
+'step.6':['内容与数据','Мазмұн мен деректер','Contenido y datos'],
+'step.7':['审查与生成','Тексеру және жасау','Revisión y generación'],
+'stepS.1':['基本信息','Негізгі','Básico'],
+'stepS.2':['目标与用户','Мақсат','Objetivo'],
+'stepS.3':['屏幕与布局','Макет','Layout'],
+'stepS.4':['视觉风格','Стиль','Estilo'],
+'stepS.5':['组件与交互','Компоненттер','Componentes'],
+'stepS.6':['内容与数据','Деректер','Datos'],
+'stepS.7':['审查与生成','Жасау','Generar'],
+'s1.sub':['先给原型命名，并说明它属于哪个项目、是什么类型的产品。','Прототипке ат беріп, оның қай жобаға жататынын және қандай өнім екенін көрсетіңіз.','Ponle nombre al mockup e indica a qué proyecto pertenece y qué tipo de producto es.'],
+'s2.sub':['明确原型要解决的问题以及谁会使用它，这会影响信息密度与交互复杂度。','Прототип шешетін мәселені және оны кім қолданатынын нақтылаңыз — бұл ақпарат тығыздығы мен интерактив күрделілігіне әсер етеді.','Define qué problema resuelve y quién lo usará; esto afecta a la densidad de información y a la complejidad de la interacción.'],
+'s3.sub':['选择目标设备尺寸和整体布局。参考示例 Tech Pubs Converter 使用的是桌面三栏布局。','Мақсатты құрылғы өлшемі мен жалпы макетті таңдаңыз. Tech Pubs Converter үлгісі үш бағанды жұмыс үстелі макетін қолданады.','Elige el tamaño del dispositivo y el layout general. El ejemplo Tech Pubs Converter usa tres columnas en escritorio.'],
+'s4.sub':['选择调色板、字体和圆角。可以上传截图或参考 HTML，让助手提取风格。','Түстер палитрасын, қаріпті және бұрыштарды таңдаңыз. Стильді алу үшін скриншот немесе HTML жүктей аласыз.','Elige paleta, tipografía y redondeo. Puedes subir una captura o un HTML de referencia para extraer el estilo.'],
+'s5.sub':['列出界面需要的组件，并决定原型的交互程度。','Интерфейске қажет компоненттерді таңдап, интерактивтілік деңгейін анықтаңыз.','Enumera los componentes que necesita la interfaz y decide el nivel de interacción.'],
+'s6.sub':['原型中显示的示例数据来自哪里？使用什么语言？','Прототиптегі мысал деректер қайдан алынады? Қай тіл қолданылады?','¿De dónde salen los datos de ejemplo? ¿En qué idioma?'],
+'s7.sub':['确认所有答案，然后生成可交互的 HTML 原型。','Барлық жауаптарды растап, интерактивті HTML прототипін жасаңыз.','Confirma todas las respuestas y genera el mockup HTML interactivo.'],
+
+'q.name':['原型名称','Прототип атауы','Nombre del mockup'],
+'q.name.h':['简短、易识别的名称','Қысқа әрі оңай танылатын атау','Corto y fácil de reconocer'],
+'q.name.ph':['例如：维修工单仪表板','Мысалы: Техникалық қызмет тапсырыстарының тақтасы','Ej.: Dashboard de órdenes de mantenimiento'],
+'q.project':['项目 / 客户','Жоба / Тапсырыс беруші','Proyecto / Cliente'],
+'q.project.h':['用于在列表中分组','Тізімде топтастыру үшін','Para agrupar en la lista'],
+'q.project.ph':['例如：ATX-MRO-2026','Мысалы: ATX-MRO-2026','Ej.: ATX-MRO-2026'],
+'q.type':['产品类型','Өнім түрі','Tipo de producto'],
+'q.type.h':['决定默认的组件与布局建议','Әдепкі компоненттер мен макет ұсыныстарын анықтайды','Determina los componentes y layouts recomendados'],
+'type.web':['Web 应用','Веб-қосымша','Aplicación web'],
+'type.web.d':['工作台 / 工具','Жұмыс құралы','Herramienta'],
+'type.dash':['仪表板','Бақылау тақтасы','Dashboard'],
+'type.dash.d':['KPI / 监控','KPI / мониторинг','KPI / monitorización'],
+'type.mobile':['移动应用','Мобильді қосымша','App móvil'],
+'type.landing':['落地页','Лендинг','Landing page'],
+'type.landing.d':['营销 / 门户','Маркетинг / портал','Marketing / portal'],
+'q.desc':['简短描述','Қысқаша сипаттама','Descripción breve'],
+'q.desc.h':['一两句话说明这个原型要展示什么','Прототип нені көрсететінін бір-екі сөйлеммен түсіндіріңіз','Explica en una o dos frases qué debe mostrar'],
+'q.desc.ph':['例如：一个三栏工作台，用于查看、转换和验证技术文档…','Мысалы: техникалық құжаттарды қарау, түрлендіру және тексеруге арналған үш бағанды жұмыс үстелі…','Ej.: espacio de trabajo en tres columnas para ver, convertir y validar documentación técnica…'],
+
+'q.goal':['主要目标','Негізгі мақсат','Objetivo principal'],
+'q.goal.h':['用户使用该界面时最想完成的一件事是什么？','Пайдаланушы осы интерфейсте ең алдымен не істегісі келеді?','¿Qué es lo que más quiere conseguir el usuario con esta interfaz?'],
+'q.goal.ph':['例如：让技术作者在 5 分钟内完成 S1000D 到 DITA 的转换并通过 BREX 验证','Мысалы: техникалық автор 5 минутта S1000D-ны DITA-ға түрлендіріп, BREX тексерісінен өткізсін','Ej.: que el redactor técnico convierta de S1000D a DITA y pase BREX en 5 minutos'],
+'q.users':['目标用户','Мақсатты пайдаланушылар','Usuarios objetivo'],
+'q.multi':['可多选','Бірнешеуін таңдауға болады','Selección múltiple'],
+'u.writer':['技术作者','Техникалық автор','Redactor técnico'],
+'u.engineer':['工程师','Инженер','Ingeniero'],
+'u.tech':['维修技师','Техник','Técnico de mantenimiento'],
+'u.pilot':['飞行员','Ұшқыш','Piloto'],
+'u.qa':['质量审核员','Сапа аудиторы','Auditor de calidad'],
+'u.pm':['项目经理','Жоба менеджері','Jefe de proyecto'],
+'u.trainer':['培训讲师','Оқытушы','Formador'],
+'u.client':['外部客户','Сыртқы клиент','Cliente externo'],
+'q.level':['用户经验水平','Пайдаланушы тәжірибесі','Nivel de experiencia'],
+'q.level.h':['影响引导与提示的多少','Нұсқаулар мен кеңестер көлеміне әсер етеді','Afecta a la cantidad de ayudas'],
+'level.novice':['新手','Бастаушы','Principiante'],
+'level.mid':['中级','Орташа','Intermedio'],
+'level.expert':['专家','Сарапшы','Experto'],
+'q.success':['成功标准','Табыс өлшемі','Criterio de éxito'],
+'q.success.h':['如何判断原型达到目的？','Прототип мақсатқа жеткенін қалай білеміз?','¿Cómo sabremos que cumple su objetivo?'],
+'q.success.ph':['例如：客户评审一次通过','Мысалы: клиент бірінші реттен бекітеді','Ej.: el cliente lo aprueba a la primera'],
+
+'q.device':['目标设备 / 尺寸','Құрылғы / өлшем','Dispositivo / tamaño'],
+'q.device.h':['原型将按此视口尺寸设计','Прототип осы экран өлшеміне жасалады','El mockup se diseñará para este viewport'],
+'dev.desktop':['桌面','Жұмыс үстелі','Escritorio'],
+'dev.tablet':['平板','Планшет','Tablet'],
+'dev.mobile':['手机','Телефон','Móvil'],
+'q.layout':['页面布局','Бет макеті','Layout de página'],
+'q.layout.h':['主要工作区的分栏方式','Негізгі жұмыс аймағының бағандарға бөлінуі','Cómo se divide el área de trabajo'],
+'lay.three':['三栏','Үш баған','Tres columnas'],
+'lay.side':['侧栏 + 内容','Бүйір панель + мазмұн','Lateral + contenido'],
+'lay.single':['单栏','Бір баған','Una columna'],
+'lay.single.d':['居中','Ортада','Centrado'],
+'lay.grid':['卡片网格','Карточкалар торы','Rejilla de tarjetas'],
+'q.screens':['屏幕数量','Экрандар саны','Número de pantallas'],
+'q.screens.h':['需要设计的不同页面 / 状态','Жобаланатын беттер / күйлер','Páginas o estados distintos a diseñar'],
+'q.nav':['主导航方式','Негізгі навигация','Navegación principal'],
+'q.nav.h':['用户如何在屏幕间切换','Пайдаланушы экрандар арасында қалай ауысады','Cómo se cambia de pantalla'],
+'nav.top':['顶部栏','Жоғарғы жолақ','Barra superior'],
+'nav.side':['左侧栏','Сол жақ панель','Barra lateral'],
+'nav.tabs':['标签页','Қойындылар','Pestañas'],
+'nav.bottom':['底部标签栏','Төменгі қойындылар','Pestañas inferiores'],
+'nav.none':['无导航','Навигациясыз','Sin navegación'],
+
+'q.palette':['调色板','Түстер палитрасы','Paleta de colores'],
+'q.palette.h':['主色 · 强调色 · 状态色 · 背景','Негізгі · екпін · күй · фон','Principal · acento · estado · fondo'],
+'pal.indigo':['靛蓝 / 琥珀','Индиго / сарғыш','Índigo / ámbar'],
+'pal.indigo.d':['默认 · 参考示例','Әдепкі · үлгі','Por defecto · ejemplo'],
+'pal.corp':['企业蓝','Корпоративтік көк','Azul corporativo'],
+'pal.corp.d':['稳重 · 正式','Байсалды · ресми','Sobrio · formal'],
+'pal.dark':['深色模式','Қараңғы режим','Modo oscuro'],
+'pal.dark.d':['驾驶舱 · 夜间','Кабина · түнгі','Cabina · nocturno'],
+'pal.teal':['青绿 / 珊瑚','Көгілдір / маржан','Verde azulado / coral'],
+'pal.teal.d':['清新 · 友好','Жеңіл · жайлы','Fresco · amable'],
+'q.font':['字体组合','Қаріптер','Tipografía'],
+'q.font.h':['标题 / 正文 + 代码','Тақырып / мәтін + код','Títulos / texto + código'],
+'q.radius':['圆角大小','Бұрыш радиусы','Radio de esquinas'],
+'q.radius.h':['卡片和按钮的圆角','Карточкалар мен батырмалар бұрышы','Esquinas de tarjetas y botones'],
+'q.refs':['参考资料','Анықтамалық материалдар','Referencias'],
+'q.refs.h':['截图、现有 HTML 或品牌指南（可选）','Скриншот, бар HTML немесе бренд нұсқаулығы (міндетті емес)','Capturas, HTML existente o guía de marca (opcional)'],
+'drop.label':['&#128206; 点击上传参考文件','&#128206; Анықтама файлын жүктеу','&#128206; Haz clic para subir referencias'],
+
+'q.components':['所需组件','Қажетті компоненттер','Componentes necesarios'],
+'q.components.h':['可多选，至少选择一项','Бірнешеуін таңдауға болады, кемінде біреуі','Selección múltiple, al menos uno'],
+'c.table':['数据表格','Деректер кестесі','Tabla de datos'],
+'c.form':['表单','Форма','Formulario'],
+'c.chart':['图表','Диаграмма','Gráfico'],
+'c.chat':['AI 聊天面板','AI чат панелі','Panel de chat IA'],
+'c.upload':['文件上传','Файл жүктеу','Subida de archivos'],
+'c.code':['代码查看器','Код қарау құралы','Visor de código'],
+'c.wizard':['向导步骤','Шебер қадамдары','Pasos de asistente'],
+'c.toast':['通知 Toast','Toast хабарламалары','Notificaciones toast'],
+'c.modal':['模态框','Модальды терезе','Ventana modal'],
+'c.search':['搜索过滤','Іздеу және сүзгі','Búsqueda y filtros'],
+'c.map':['地图','Карта','Mapa'],
+'c.timeline':['时间线','Уақыт сызығы','Línea de tiempo'],
+'q.interaction':['交互程度','Интерактивтілік деңгейі','Nivel de interacción'],
+'q.interaction.h':['交互越多，开发时间越长','Интерактив көп болса, әзірлеу ұзағырақ','Más interacción = más tiempo de desarrollo'],
+'int.static':['静态','Статикалық','Estático'],
+'int.static.d':['仅视觉展示','Тек көрініс','Solo visual'],
+'int.click':['可点击','Басылатын','Clicable'],
+'int.click.d':['导航 + 状态切换','Навигация + күйлер','Navegación + estados'],
+'int.full':['完全模拟','Толық симуляция','Simulación completa'],
+'int.full.d':['模拟数据 + 逻辑','Деректер + логика','Datos + lógica'],
+'q.flow':['关键交互流程','Негізгі әрекет ағыны','Flujo de interacción clave'],
+'q.flow.h':['描述用户点击的主要路径','Пайдаланушының негізгі жолын сипаттаңыз','Describe el recorrido principal del usuario'],
+'q.flow.ph':['例如：加载文件 → 选择目标格式 → 点击转换 → 运行 BREX 验证 → 向 AI 提问','Мысалы: файл жүктеу → формат таңдау → түрлендіру → BREX тексеру → AI-дан сұрау','Ej.: cargar archivo → elegir formato → convertir → validar BREX → preguntar a la IA'],
+
+'q.data':['示例数据来源','Мысал деректер көзі','Origen de los datos de ejemplo'],
+'q.data.h':['客户评审时，真实感很重要','Клиент тексерісінде шынайылық маңызды','En la revisión con cliente, el realismo importa'],
+'ds.fake':['虚构数据','Ойдан шығарылған','Datos ficticios'],
+'ds.fake.d':['由助手生成','Көмекші жасайды','Los genera el asistente'],
+'ds.user':['用户提供','Пайдаланушыдан','Aportados por el usuario'],
+'ds.user.d':['CSV / XML 文件','CSV / XML файлы','Archivo CSV / XML'],
+'ds.anon':['真实脱敏','Нақты, анонимді','Reales anonimizados'],
+'ds.anon.d':['已匿名化','Анонимделген','Anonimizados'],
+'q.lang':['界面语言','Интерфейс тілі','Idioma de la interfaz'],
+'q.lang.h':['所有标签和示例文本','Барлық белгілер мен мысал мәтіндер','Todas las etiquetas y textos'],
+'q.terms':['术语标准','Терминология стандарты','Estándar terminológico'],
+'q.terms.h':['领域词汇参照','Салалық сөздік','Vocabulario de referencia'],
+'terms.none':['无','Жоқ','Ninguno'],
+'q.labels':['必须出现的文本 / 标签','Міндетті мәтіндер / белгілер','Textos / etiquetas obligatorios'],
+'q.labels.h':['标题、按钮文案、品牌名等，每行一项','Тақырыптар, батырма мәтіндері, бренд — әр жолға біреу','Títulos, botones, marca… uno por línea'],
+
+'rv.preview':['布局预览','Макетті алдын ала қарау','Vista previa del layout'],
+'rv.checks':['完整性检查','Толықтығын тексеру','Comprobación de completitud'],
+'rv.summary':['答案摘要','Жауаптар қорытындысы','Resumen de respuestas'],
+'rv.nolayout':['尚未选择布局','Макет әлі таңдалмаған','Layout sin elegir'],
+'rv.fill':['去填写','Толтыру','Completar'],
+'rv.edit':['编辑','Өңдеу','Editar'],
+'rv.missing':['缺失（必填）','Жоқ (міндетті)','Falta (obligatorio)'],
+'gen.title':['准备生成原型','Прототип жасауға дайын','Listo para generar'],
+'gen.missing':['还有 {n} 个必填项未完成。','Тағы {n} міндетті өріс толтырылмаған.','Faltan {n} campos obligatorios.'],
+'gen.ready':['将生成 {s} 个屏幕的「{i}」HTML 原型（{d}）。','{s} экраннан тұратын «{i}» HTML прототипі жасалады ({d}).','Se generará un mockup HTML «{i}» de {s} pantallas ({d}).'],
+'gen.btn':['&#9654; 生成原型','&#9654; Прототип жасау','&#9654; Generar mockup'],
+
+'chat.name':['AI 原型助手','AI прототип көмекшісі','Asistente IA de mockups'],
+'chat.upload':['&#128206; 加载截图 / 参考 HTML / 品牌指南','&#128206; Скриншот / HTML / бренд нұсқаулығын жүктеу','&#128206; Cargar captura / HTML / guía de marca'],
+'chat.autofill':['&#9881; 根据参考示例自动填写','&#9881; Үлгі бойынша автотолтыру','&#9881; Autorrellenar desde el ejemplo'],
+'chat.ux':['&#127775; 应用 UX 规范检查','&#127775; UX ережелерін тексеру','&#127775; Aplicar revisión UX'],
+'qa.explain':['解释此步','Қадамды түсіндіру','Explicar paso'],
+'qa.suggest':['推荐答案','Жауап ұсыну','Sugerir'],
+'qa.check':['检查完整性','Толықтығы','Comprobar'],
+'qa.spec':['生成规格','Спецификация','Ver spec'],
+'qa.explain.u':['解释这一步','Осы қадамды түсіндір','Explica este paso'],
+'qa.suggest.u':['推荐答案','Жауап ұсын','Sugiere respuestas'],
+'qa.check.u':['检查完整性','Толықтығын тексер','Comprueba qué falta'],
+'qa.spec.u':['生成规格说明','Спецификация жаса','Genera la especificación'],
+'chat.ph':['询问布局、调色板、组件…','Макет, палитра туралы сұраңыз…','Pregunta sobre layout, paleta…'],
+'chat.hint':['AI 回复为演示用模拟内容。','AI жауаптары демонстрация үшін модельденген.','Las respuestas de la IA son simuladas para la demo.'],
+'chat.send':['发送','Жіберу','Enviar'],
+'now':['刚刚','Жаңа ғана','Ahora'],
+'chat.welcome':[
+ '你好！我是你的 <strong>AI 原型助手</strong>。我可以帮你：<br><br>&bull; <strong>引导</strong>完成 7 个步骤的原型向导<br>&bull; <strong>推荐</strong>每个问题的合理答案<br>&bull; <strong>提取</strong>截图或参考 HTML 的风格与尺寸<br>&bull; <strong>检查</strong>原型规格是否完整、符合 UX 规范<br><br>从左侧选择一个原型进行编辑，或点击 <code>新建原型</code> 开始！',
+ 'Сәлем! Мен сіздің <strong>AI прототип көмекшіңізбін</strong>. Мен:<br><br>&bull; 7 қадамдық шебер арқылы <strong>бағыттаймын</strong><br>&bull; әр сұраққа орынды жауап <strong>ұсынамын</strong><br>&bull; скриншот не HTML үлгіден стиль мен өлшемді <strong>аламын</strong><br>&bull; спецификацияның толықтығы мен UX ережелеріне сәйкестігін <strong>тексеремін</strong><br><br>Сол жақтан прототипті таңдаңыз немесе <code>Жаңа прототип</code> батырмасын басыңыз!',
+ '¡Hola! Soy tu <strong>asistente IA de mockups</strong>. Puedo:<br><br>&bull; <strong>Guiarte</strong> por los 7 pasos del asistente<br>&bull; <strong>Sugerir</strong> respuestas razonables a cada pregunta<br>&bull; <strong>Extraer</strong> estilo y tamaño de capturas o HTML de referencia<br>&bull; <strong>Comprobar</strong> que la especificación está completa y cumple las pautas UX<br><br>Elige un mockup a la izquierda o pulsa <code>Nuevo mockup</code> para empezar.'],
+'msg.opened':['已打开 <strong>{name}</strong>（{st} · 完成度 {p}%）。','<strong>{name}</strong> ашылды ({st} · толықтығы {p}%).','Abierto <strong>{name}</strong> ({st} · {p}% completado).'],
+'msg.opened.full':['<br><br>所有必填项已完成，可以直接在第 7 步重新生成或修改任意答案。','<br><br>Барлық міндетті өрістер толтырылған — 7-қадамда қайта жасауға немесе кез келген жауапты өзгертуге болады.','<br><br>Todos los obligatorios están completos: puedes regenerar en el paso 7 o cambiar cualquier respuesta.'],
+'msg.opened.jump':['<br><br>我已跳转到第一个未完成的步骤：{tag}。','<br><br>Бірінші толтырылмаған қадамға өттім: {tag}.','<br><br>He saltado al primer paso pendiente: {tag}.'],
+'msg.new':['好的，我们开始一个<strong>新原型</strong>！<br><br>第一步：给它起个名字，并选择产品类型。如果你有截图或参考 HTML，可以先上传，我会帮你自动填写风格和布局。','Жарайды, <strong>жаңа прототипті</strong> бастайық!<br><br>Бірінші қадам: оған ат беріп, өнім түрін таңдаңыз. Скриншот не HTML үлгіңіз болса, алдымен жүктеңіз — стиль мен макетті өзім толтырамын.','¡Vamos con un <strong>mockup nuevo</strong>!<br><br>Primer paso: ponle nombre y elige el tipo de producto. Si tienes una captura o un HTML de referencia, súbelo primero y rellenaré el estilo y el layout.'],
+'toast.new':['已开始新的原型','Жаңа прототип басталды','Nuevo mockup iniciado'],
+'toast.dup':['已复制：','Көшірілді: ','Duplicado: '],
+'toast.del':['已删除：','Жойылды: ','Eliminado: '],
+'toast.needName':['请先填写原型名称','Алдымен прототип атауын енгізіңіз','Primero escribe el nombre del mockup'],
+'toast.saved':['草稿已保存：','Нобай сақталды: ','Borrador guardado: '],
+'toast.missingReq':['还有必填项未完成','Міндетті өрістер толтырылмаған','Faltan campos obligatorios'],
+'toast.generated':['原型已生成：','Прототип жасалды: ','Mockup generado: '],
+'toast.refs':['已加载参考：','Анықтамалар жүктелді: ','Referencias cargadas: '],
+'toast.autofill':['已根据参考示例填写布局与风格','Макет пен стиль үлгі бойынша толтырылды','Layout y estilo rellenados desde el ejemplo'],
+'toast.sug':['已应用推荐答案','Ұсынылған жауаптар қолданылды','Respuestas sugeridas aplicadas'],
+'gen.msg.head':['&#10024; 原型 <strong>{name}</strong> 已生成并提交审核！','&#10024; <strong>{name}</strong> прототипі жасалып, тексеруге жіберілді!','&#10024; ¡Mockup <strong>{name}</strong> generado y enviado a revisión!'],
+'gen.msg.vp':['视口','Экран','Viewport'],
+'gen.msg.layout':['布局','Макет','Layout'],
+'gen.msg.screens':['个屏幕','экран','pantallas'],
+'gen.msg.palette':['调色板','Палитра','Paleta'],
+'gen.msg.comps':['组件','Компоненттер','Componentes'],
+'gen.msg.file':['文件','Файл','Archivo'],
+'gen.msg.ask':['需要我运行 UX 规范检查吗？','UX тексерісін іске қосайын ба?','¿Paso la revisión UX?'],
+'msg.refs':['已分析参考文件 {files}。<br><br>检测到：<br>&bull; 视口约 {vp}，三栏布局<br>&bull; 主色 {c1}，强调色 {c2}<br>&bull; 字体 Outfit + Source Code Pro<br><br>{btn}','{files} файлы талданды.<br><br>Анықталды:<br>&bull; Экран шамамен {vp}, үш бағанды макет<br>&bull; Негізгі түс {c1}, екпін түсі {c2}<br>&bull; Қаріп Outfit + Source Code Pro<br><br>{btn}','He analizado {files}.<br><br>Detectado:<br>&bull; Viewport aprox. {vp}, tres columnas<br>&bull; Color principal {c1}, acento {c2}<br>&bull; Tipografía Outfit + Source Code Pro<br><br>{btn}'],
+'btn.apply':['应用到向导','Шеберге қолдану','Aplicar al asistente'],
+'msg.autofill':['已根据 {file} 自动填写：<br>&bull; 桌面 1440×900 · 三栏 {grid}<br>&bull; 靛蓝 / 琥珀调色板 · 圆角 12px<br>&bull; 文件上传、AI 聊天面板、Toast 组件<br><br>请检查第 3–5 步，确认是否符合你的需求。','{file} бойынша автоматты толтырылды:<br>&bull; Жұмыс үстелі 1440×900 · үш баған {grid}<br>&bull; Индиго / сарғыш палитра · бұрыш 12px<br>&bull; Файл жүктеу, AI чат панелі, Toast<br><br>3–5 қадамдарды тексеріп, қажеттілігіңізге сай екенін растаңыз.','Rellenado desde {file}:<br>&bull; Escritorio 1440×900 · tres columnas {grid}<br>&bull; Paleta índigo / ámbar · radio 12px<br>&bull; Subida de archivos, chat IA y toasts<br><br>Revisa los pasos 3–5 para confirmar que encaja con lo que necesitas.'],
+
+'tip.1':['<strong>第 1 步 · 基本信息</strong><br>名称尽量具体，例如“维修工单仪表板”比“仪表板”更好。产品类型会影响我后面推荐的布局。','<strong>1-қадам · Негізгі ақпарат</strong><br>Атауы нақты болсын: «Техникалық қызмет тапсырыстары тақтасы» жай «Тақта» дегеннен жақсы. Өнім түрі кейінгі макет ұсыныстарыма әсер етеді.','<strong>Paso 1 · Información básica</strong><br>Usa un nombre concreto: «Dashboard de órdenes de mantenimiento» es mejor que «Dashboard». El tipo de producto influye en los layouts que te recomendaré.'],
+'tip.2':['<strong>第 2 步 · 目标与用户</strong><br>只写<strong>一个</strong>主要目标。如果有多个目标，通常意味着需要多个屏幕或多个原型。','<strong>2-қадам · Мақсат пен пайдаланушылар</strong><br>Тек <strong>бір</strong> негізгі мақсат жазыңыз. Мақсат бірнешеу болса, әдетте бірнеше экран не бірнеше прототип керек.','<strong>Paso 2 · Objetivo y usuarios</strong><br>Escribe <strong>un solo</strong> objetivo principal. Si hay varios, normalmente hacen falta varias pantallas o varios mockups.'],
+'tip.3':['<strong>第 3 步 · 屏幕与布局</strong><br>参考示例使用 <code>1fr 1fr 360px</code> 的三栏布局，适合“输入 → 输出 → 助手”的工作流。手机端建议单栏。','<strong>3-қадам · Экран және макет</strong><br>Үлгі <code>1fr 1fr 360px</code> үш бағанды макетін қолданады — «кіріс → шығыс → көмекші» ағынына ыңғайлы. Телефонға бір баған ұсынылады.','<strong>Paso 3 · Pantalla y layout</strong><br>El ejemplo usa tres columnas <code>1fr 1fr 360px</code>, ideal para el flujo «entrada → salida → asistente». En móvil, mejor una sola columna.'],
+'tip.4':['<strong>第 4 步 · 视觉风格</strong><br>如果客户有品牌指南，请上传，我会提取主色与字体。默认的靛蓝 / 琥珀与参考示例一致。','<strong>4-қадам · Визуалды стиль</strong><br>Клиенттің бренд нұсқаулығы болса, жүктеңіз — негізгі түс пен қаріпті алып беремін. Әдепкі индиго / сарғыш палитра үлгімен бірдей.','<strong>Paso 4 · Estilo visual</strong><br>Si el cliente tiene guía de marca, súbela y extraeré color principal y tipografía. La paleta índigo / ámbar por defecto es la del ejemplo.'],
+'tip.5':['<strong>第 5 步 · 组件与交互</strong><br>“可点击”通常足够用于客户评审；“完全模拟”适合需要演示完整流程的场景。','<strong>5-қадам · Компоненттер мен интерактив</strong><br>Клиент тексерісіне әдетте «Басылатын» жеткілікті; «Толық симуляция» толық ағынды көрсету керек болғанда қолайлы.','<strong>Paso 5 · Componentes e interacción</strong><br>«Clicable» suele bastar para una revisión con cliente; «Simulación completa» sirve para demostrar el flujo entero.'],
+'tip.6':['<strong>第 6 步 · 内容与数据</strong><br>真实感的示例数据（如 DMC 编码、件号）能显著提升评审效果。避免使用 Lorem ipsum。','<strong>6-қадам · Мазмұн мен деректер</strong><br>Шынайы мысал деректер (DMC кодтары, бөлшек нөмірлері) тексеріс сапасын айтарлықтай арттырады. Lorem ipsum қолданбаңыз.','<strong>Paso 6 · Contenido y datos</strong><br>Datos realistas (códigos DMC, números de pieza) mejoran mucho la revisión. Evita el Lorem ipsum.'],
+'tip.7':['<strong>第 7 步 · 审查与生成</strong><br>检查摘要，点击任意“编辑”即可返回修改。所有必填项完成后即可生成。','<strong>7-қадам · Тексеру және жасау</strong><br>Қорытындыны тексеріңіз; өзгерту үшін кез келген «Өңдеу» сілтемесін басыңыз. Міндетті өрістер толтырылса, жасауға болады.','<strong>Paso 7 · Revisión y generación</strong><br>Revisa el resumen y pulsa cualquier «Editar» para volver. Con todos los obligatorios completos, podrás generar.'],
+
+'sug.done':['已为第 {s} 步填写推荐的 {what}。你可以随时修改。','{s}-қадамға ұсынылған мәндер толтырылды: {what}. Кез келген уақытта өзгерте аласыз.','He rellenado el paso {s} con valores sugeridos: {what}. Puedes cambiarlos cuando quieras.'],
+'sug.name':['新的技术出版物工具','Жаңа техникалық басылым құралы','Nueva herramienta de publicaciones técnicas'],
+'sug.goal':['让技术作者快速完成文档转换并通过验证','Техникалық авторлар құжатты тез түрлендіріп, тексерістен өткізсін','Que los redactores técnicos conviertan y validen documentos rápidamente'],
+'sug.all':['所有缺失项','барлық жетіспейтін өрістер','todos los campos pendientes'],
+'chk.missing':['还有 <strong>{n}</strong> 个必填项未完成：','Тағы <strong>{n}</strong> міндетті өріс толтырылмаған:','Faltan <strong>{n}</strong> campos obligatorios:'],
+'chk.step':['第 {s} 步','{s}-қадам','Paso {s}'],
+'chk.jump':['跳到第一个缺失项','Біріншісіне өту','Ir al primero pendiente'],
+'chk.ok':['&#10003; 所有必填项都已完成！可以前往第 7 步生成原型。','&#10003; Барлық міндетті өрістер толтырылды! 7-қадамда прототип жасауға болады.','&#10003; ¡Todos los obligatorios completos! Ve al paso 7 para generar el mockup.'],
+'chk.go':['前往审查','Тексеруге өту','Ir a revisión'],
+'spec.title':['原型规格','Прототип спецификациясы','Especificación del mockup'],
+
+'ux.need':['请先选择或新建一个原型','Алдымен прототипті таңдаңыз немесе жасаңыз','Primero elige o crea un mockup'],
+'ux.running':['正在应用 UX 规范检查…','UX тексерісі жүргізілуде…','Aplicando revisión UX…'],
+'ux.w1':['手机视口不建议使用三栏布局，请改为单栏。','Телефон экранында үш баған ұсынылмайды — бір бағанға ауыстырыңыз.','No se recomiendan tres columnas en móvil; usa una sola.'],
+'ux.w2':['组件数量（{n}）较多，建议拆分为多个屏幕。','Компоненттер саны ({n}) көп — бірнеше экранға бөлуді ұсынамын.','Hay muchos componentes ({n}); conviene repartirlos en varias pantallas.'],
+'ux.w3':['深色模式通常用于驾驶舱 / 夜间场景，请确认用户需求。','Қараңғы режим әдетте кабина / түнгі жағдайда қолданылады — қажеттілікті растаңыз.','El modo oscuro suele ser para cabina o uso nocturno; confirma que lo necesitan.'],
+'ux.w4':['圆角 {n}px 偏大，工业类工具建议 8–14px。','{n}px бұрыш тым үлкен — өнеркәсіптік құралдарға 8–14px ұсынылады.','Un radio de {n}px es grande; en herramientas industriales se recomienda 8–14px.'],
+'ux.w5':['未描述关键交互流程（第 5 步），评审时可能不清楚演示路径。','Негізгі әрекет ағыны сипатталмаған (5-қадам) — тексерісте көрсету жолы түсініксіз болуы мүмкін.','Falta el flujo de interacción clave (paso 5); en la revisión puede no quedar clara la demo.'],
+'ux.toastWarn':['UX 检查完成 — {n} 条建议','UX тексерісі аяқталды — {n} ұсыныс','Revisión UX terminada — {n} sugerencias'],
+'ux.toastOk':['UX 检查通过','UX тексерісі сәтті өтті','Revisión UX superada'],
+'ux.head':['UX 规范检查结果：<br><br>&#10003; 对比度：主色与背景符合 WCAG AA<br>&#10003; 字号：正文 ≥ 12px','UX тексерісінің нәтижесі:<br><br>&#10003; Контраст: негізгі түс пен фон WCAG AA талабына сай<br>&#10003; Мәтін өлшемі ≥ 12px','Resultado de la revisión UX:<br><br>&#10003; Contraste: color principal y fondo cumplen WCAG AA<br>&#10003; Tamaño de texto ≥ 12px'],
+'ux.advice':['这些是建议，不是错误。','Бұлар қате емес, ұсыныстар.','Son sugerencias, no errores.'],
+'ux.ok':['&#10003; 布局与设备匹配<br><br>没有发现问题！','&#10003; Макет құрылғыға сай<br><br>Ешқандай мәселе табылмады!','&#10003; El layout encaja con el dispositivo<br><br>¡No hay problemas!'],
+
+'r.color':['调色板建议：工业 / 技术出版物工具使用 <span class="tag">靛蓝 / 琥珀</span> 或 <span class="tag">企业蓝</span>；驾驶舱场景使用 <span class="tag">深色模式</span>。主色用于主要按钮，琥珀用于次要操作和警告。','Палитра бойынша кеңес: өнеркәсіптік / техникалық басылым құралдарына <span class="tag">Индиго / сарғыш</span> немесе <span class="tag">Корпоративтік көк</span>; кабинаға <span class="tag">Қараңғы режим</span>. Негізгі түс — басты батырмаларға, сарғыш — қосымша әрекеттер мен ескертулерге.','Paleta recomendada: para herramientas industriales o de publicaciones técnicas, <span class="tag">Índigo / ámbar</span> o <span class="tag">Azul corporativo</span>; para cabina, <span class="tag">Modo oscuro</span>. El principal para botones primarios y el ámbar para acciones secundarias y avisos.'],
+'r.layout':['布局建议：<br>&bull; <strong>三栏</strong>：输入 → 输出 → 助手（参考示例）<br>&bull; <strong>侧栏 + 内容</strong>：导航型工具、目录<br>&bull; <strong>卡片网格</strong>：仪表板<br>&bull; <strong>单栏</strong>：手机和表单','Макет бойынша кеңес:<br>&bull; <strong>Үш баған</strong>: кіріс → шығыс → көмекші (үлгі)<br>&bull; <strong>Бүйір панель + мазмұн</strong>: навигация құралдары, каталогтар<br>&bull; <strong>Карточкалар торы</strong>: бақылау тақталары<br>&bull; <strong>Бір баған</strong>: телефон мен формалар','Layouts recomendados:<br>&bull; <strong>Tres columnas</strong>: entrada → salida → asistente (ejemplo)<br>&bull; <strong>Lateral + contenido</strong>: herramientas de navegación, catálogos<br>&bull; <strong>Rejilla de tarjetas</strong>: dashboards<br>&bull; <strong>Una columna</strong>: móvil y formularios'],
+'r.size':['参考示例按 <code>100vw × 100vh</code> 设计，在 1440×900 下效果最佳：头部 58px，工作区 <code>1fr 1fr 360px</code>，右侧聊天面板固定 360px。','Үлгі <code>100vw × 100vh</code> бойынша жасалған, 1440×900 өлшемінде жақсы көрінеді: тақырып 58px, жұмыс аймағы <code>1fr 1fr 360px</code>, оң жақ чат панелі 360px.','El ejemplo está pensado a <code>100vw × 100vh</code> y se ve mejor a 1440×900: cabecera de 58px, área de trabajo <code>1fr 1fr 360px</code> y panel de chat fijo de 360px.'],
+'r.comp':['每个屏幕建议不超过 5–6 种主要组件。技术出版物工具的常用组合：<span class="tag">文件上传</span> <span class="tag">代码查看器</span> <span class="tag">AI 聊天面板</span> <span class="tag">通知 Toast</span>。','Әр экранда 5–6 негізгі компоненттен аспағаны жөн. Техникалық басылым құралдарына жиі қолданылатын жиынтық: <span class="tag">Файл жүктеу</span> <span class="tag">Код қарау құралы</span> <span class="tag">AI чат панелі</span> <span class="tag">Toast</span>.','Mejor no pasar de 5–6 componentes principales por pantalla. Para publicaciones técnicas lo habitual es: <span class="tag">Subida de archivos</span> <span class="tag">Visor de código</span> <span class="tag">Chat IA</span> <span class="tag">Toasts</span>.'],
+'r.gen':['完成所有必填项后，在第 7 步点击 <code>生成原型</code>。输出是单个自包含的 HTML 文件，可直接在浏览器中打开，或分享给客户评审。','Барлық міндетті өрістерді толтырған соң, 7-қадамда <code>Прототип жасау</code> батырмасын басыңыз. Нәтиже — браузерде ашылатын не клиентке жіберілетін бір HTML файл.','Cuando completes los obligatorios, pulsa <code>Generar mockup</code> en el paso 7. El resultado es un único HTML autocontenido que se abre en el navegador o se comparte con el cliente.'],
+'r.default':['好问题！当前在第 <strong>{s}</strong> 步（{name}）。','Жақсы сұрақ! Қазір <strong>{s}</strong>-қадамдасыз ({name}).','¡Buena pregunta! Estás en el paso <strong>{s}</strong> ({name}).']
+};
+
+var lang = 'zh';
+try { var _l = localStorage.getItem('mb-lang'); if(LANGS.indexOf(_l)>-1) lang=_l; } catch(e){}
+
+function t(k,p){
+  var row = D[k]; if(!row) return k;
+  var s = row[LANGS.indexOf(lang)]; if(s==null) s=row[0];
+  if(p) for(var x in p) s = s.split('{'+x+'}').join(p[x]);
+  return s;
+}
+/* text that may be localized object {zh,kk,es} or plain string */
+function tx(v){ return (v && typeof v==='object' && !Array.isArray(v)) ? (v[lang]||v.zh||'') : (v==null?'':v); }
+
+/* =====================================================
+   CONSTANTS
+===================================================== */
+var USERS = ['writer','engineer','tech','pilot','qa','pm','trainer','client'];
+var COMPS = ['table','form','chart','chat','upload','code','wizard','toast','modal','search','map','timeline'];
+var REQ = {1:['name','type'],2:['goal','users'],3:['device','layout'],4:['palette'],5:['components','interaction'],6:['dataSource']};
+var REQ_ALL = [].concat(REQ[1],REQ[2],REQ[3],REQ[4],REQ[5],REQ[6]);
+var FIELD_KEY = {name:'q.name',type:'q.type',goal:'q.goal',users:'q.users',device:'q.device',layout:'q.layout',palette:'q.palette',components:'q.components',interaction:'q.interaction',dataSource:'q.data'};
+var FIELD_STEP = {name:1,type:1,goal:2,users:2,device:3,layout:3,palette:4,components:5,interaction:5,dataSource:6};
+var DIMS = {desktop:'1440×900',tablet:'1024×768',mobile:'390×844'};
+var PREFIX = {type:'type.',device:'dev.',layout:'lay.',palette:'pal.',interaction:'int.',dataSource:'ds.',level:'level.',nav:'nav.'};
+var PAL = {indigo:['#4f46e5','#fbbf24','#10b981','#f1f4f9'],corp:['#1e3a8a','#0ea5e9','#64748b','#f8fafc'],dark:['#818cf8','#a78bfa','#64748b','#1e293b'],teal:['#0f766e','#fb7185','#14b8a6','#f0fdfa']};
+var STATUS_CLS = {draft:'fb-slate',wip:'fb-indigo',review:'fb-amber',done:'fb-emerald'};
+var LANG_NAMES = {zh:'中文',kk:'Қазақша',es:'Español',en:'English',ru:'Русский',fr:'Français'};
+
+function lbl(f,v){
+  if(!v) return '';
+  if(f==='device') return t('dev.'+v)+' '+DIMS[v];
+  if(PREFIX[f]) return t(PREFIX[f]+v);
+  return v;
+}
+
+function emptyAns(){
+  return {name:'',project:'',type:'',desc:'',goal:'',users:[],level:'mid',success:'',device:'',layout:'',screens:3,nav:'top',
+          palette:'',font:'Outfit + Source Code Pro',radius:12,refs:[],components:[],interaction:'',flow:'',dataSource:'',lang:lang,terms:'S1000D',labels:''};
+}
+function mk(o){ var a=emptyAns(); for(var k in o) a[k]=o[k]; return a; }
+
+/* =====================================================
+   SAMPLE MOCKUPS (localized text)
+===================================================== */
+var mockups = [
+  {id:1,status:'done',updated:'2026-10-28',answers:mk({name:'Tech Pubs Converter',project:'ATX-TECHPUBS',type:'web',
+    desc:{zh:'三栏工作台：源文档、目标格式输出与 AI 转换助手。',kk:'Үш бағанды жұмыс үстелі: бастапқы құжат, мақсатты формат және AI түрлендіру көмекшісі.',es:'Espacio de trabajo en tres columnas: documento fuente, formato destino y asistente IA de conversión.'},
+    goal:{zh:'在一个界面内完成 S1000D / DITA / iSpec 之间的转换与 BREX 验证',kk:'S1000D / DITA / iSpec түрлендіруі мен BREX тексерісін бір интерфейсте орындау',es:'Convertir entre S1000D / DITA / iSpec y validar BREX desde una sola interfaz'},
+    users:['writer','engineer'],level:'expert',success:{zh:'客户演示一次通过',kk:'Клиентке көрсетілім бірінші реттен өтеді',es:'La demo al cliente se aprueba a la primera'},
+    device:'desktop',layout:'three',screens:4,nav:'top',palette:'indigo',refs:['Tech_Pubs_Converter_v1.html'],components:['code','upload','chat','toast'],interaction:'full',
+    flow:{zh:'加载文件 → 选择目标格式 → 转换 → BREX 验证 → 询问 AI',kk:'Файл жүктеу → формат таңдау → түрлендіру → BREX тексеру → AI-дан сұрау',es:'Cargar archivo → elegir formato → convertir → validar BREX → preguntar a la IA'},
+    dataSource:'fake',lang:'en',terms:'S1000D',labels:'Tech Pubs Converter\nConvert\nApply BREX / Schematron Validation'})},
+  {id:2,status:'review',updated:'2026-11-03',answers:mk({name:{zh:'维修工单仪表板',kk:'Техникалық қызмет тапсырыстары тақтасы',es:'Dashboard de órdenes de mantenimiento'},project:'ATX-MRO-2026',type:'dash',
+    desc:{zh:'展示机队维修工单状态、延误与工时的 KPI 仪表板。',kk:'Әуе паркінің техникалық қызмет тапсырыстары, кешігулер мен жұмыс сағаттары бойынша KPI тақтасы.',es:'Dashboard de KPI con el estado de las órdenes de mantenimiento de la flota, retrasos y horas.'},
+    goal:{zh:'让维修经理一眼看到逾期工单和瓶颈',kk:'Менеджер мерзімі өткен тапсырыстар мен кедергілерді бірден көрсін',es:'Que el jefe de mantenimiento vea de un vistazo las órdenes vencidas y los cuellos de botella'},
+    users:['pm','tech'],device:'desktop',layout:'grid',screens:3,nav:'side',palette:'corp',components:['chart','table','search'],interaction:'click',dataSource:'anon',terms:'iSpec 2200'})},
+  {id:3,status:'draft',updated:'2026-11-05',answers:mk({name:{zh:'零件目录搜索 (IPC)',kk:'Бөлшектер каталогында іздеу (IPC)',es:'Búsqueda en catálogo de piezas (IPC)'},project:'ATX-IPD',type:'web',
+    desc:{zh:'按 ATA 章节和件号搜索图解零件目录。',kk:'Суретті бөлшектер каталогын ATA тарауы мен бөлшек нөмірі бойынша іздеу.',es:'Búsqueda en el catálogo ilustrado de piezas por capítulo ATA y número de pieza.'},
+    users:['tech'],device:'tablet',layout:'side',components:['search','table'],terms:'S1000D'})},
+  {id:4,status:'done',updated:'2026-10-15',answers:mk({name:{zh:'电子飞行包 · 飞行员手册',kk:'EFB · Ұшқыш нұсқаулығы',es:'EFB · Manual del piloto'},project:'ATX-EFB',type:'mobile',
+    desc:{zh:'驾驶舱平板上的飞行员手册阅读器，支持夜间模式。',kk:'Кабинадағы планшетке арналған ұшқыш нұсқаулығын оқу құралы, түнгі режиммен.',es:'Lector del manual del piloto para la tablet de cabina, con modo nocturno.'},
+    goal:{zh:'飞行员在 3 次点击内找到任意程序',kk:'Ұшқыш кез келген процедураны 3 басуда тапсын',es:'Que el piloto encuentre cualquier procedimiento en 3 clics'},
+    users:['pilot'],level:'expert',device:'tablet',layout:'side',screens:5,nav:'tabs',palette:'dark',components:['search','timeline','modal'],interaction:'click',dataSource:'fake',lang:'en'})},
+  {id:5,status:'wip',updated:'2026-11-06',answers:mk({name:{zh:'质量审计移动应用',kk:'Сапа аудитінің мобильді қосымшасы',es:'App móvil de auditoría de calidad'},project:'ATX-QA',type:'mobile',
+    desc:{zh:'现场质量审核员使用的检查清单与拍照记录应用。',kk:'Сапа аудиторларына арналған тексеру тізімі мен фото тіркеу қосымшасы.',es:'App de checklists y registro fotográfico para auditores de calidad en campo.'},
+    goal:{zh:'离线完成审计并同步结果',kk:'Аудитті офлайн өткізіп, нәтижені синхрондау',es:'Hacer la auditoría sin conexión y sincronizar los resultados'},
+    users:['qa'],device:'mobile',layout:'single',screens:6,nav:'bottom',palette:'teal',components:['form','upload']})},
+  {id:6,status:'draft',updated:'2026-11-01',answers:mk({name:{zh:'培训课程管理门户',kk:'Оқу курстарын басқару порталы',es:'Portal de gestión de formación'},project:'ATX-ACADEMY',type:'landing',
+    desc:{zh:'面向客户的培训课程目录与报名门户。',kk:'Клиенттерге арналған оқу курстарының каталогы және тіркелу порталы.',es:'Portal para clientes con el catálogo de cursos e inscripciones.'},device:'desktop'})}
+];
+var nextId = 7;
+
+/* STATE */
+var cur = null, ans = emptyAns(), step = 1, filter = 'all', tipped = {};
+
+/* HELPERS */
+function filled(a,f){ var v=a[f]; return Array.isArray(v) ? v.length>0 : !!String(tx(v)).trim(); }
+function pctOf(a){ var n=0; REQ_ALL.forEach(function(f){ if(filled(a,f)) n++; }); return Math.round(n/REQ_ALL.length*100); }
+function stepDone(a,s){ return (REQ[s]||[]).every(function(f){ return filled(a,f); }); }
+function escHTML(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function getMk(id){ for(var i=0;i<mockups.length;i++) if(mockups[i].id===id) return mockups[i]; return null; }
+function clone(o){ return JSON.parse(JSON.stringify(o)); }
+function today(){ return new Date().toISOString().slice(0,10); }
+function missing(){ return REQ_ALL.filter(function(f){ return !filled(ans,f); }); }
+
+function thumbHTML(a,big){
+  var p = PAL[a.palette] || ['#94a3b8','#cbd5e1','#cbd5e1','#f1f5f9'];
+  var lay = a.layout || 'single';
+  var n = {three:3,side:2,single:1,grid:6}[lay];
+  var spans=''; for(var i=0;i<n;i++) spans += '<span'+((lay==='three'&&i===2)||(lay==='side'&&i===0)?' class="acc"':'')+'></span>';
+  var dev = a.device ? ' dev-'+a.device : '';
+  return '<div class="thumb lay-'+lay+dev+(big?' big':'')+'" style="--c1:'+p[0]+';--c2:'+p[1]+';--c3:'+p[2]+';--c4:'+p[3]+'">'+
+         '<div class="t-head"><i></i><b></b></div><div class="t-body">'+spans+'</div></div>';
+}
+
+/* =====================================================
+   LANGUAGE
+===================================================== */
+function buildChips(){
+  document.querySelectorAll('[data-group][data-prefix]').forEach(function(g){
+    var pre = g.getAttribute('data-prefix'), list = pre==='u'?USERS:COMPS;
+    g.innerHTML = list.map(function(v){ return '<div class="chip" data-v="'+v+'" data-i18n="'+pre+'.'+v+'"></div>'; }).join('');
+  });
+}
+function applyStatic(){
+  document.documentElement.lang = HTML_LANG[lang];
+  document.querySelectorAll('[data-i18n]').forEach(function(el){ el.innerHTML = t(el.getAttribute('data-i18n')); });
+  document.querySelectorAll('[data-i18n-ph]').forEach(function(el){ el.placeholder = t(el.getAttribute('data-i18n-ph')).replace(/&#\d+;/g,''); });
+  document.querySelectorAll('[data-i18n-title]').forEach(function(el){ el.title = t(el.getAttribute('data-i18n-title')); });
+  document.querySelectorAll('.lang-btn').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-lang')===lang); });
+}
+function resetChat(){
+  document.getElementById('chat-msgs').innerHTML = '';
+  addAIMsg(t('chat.welcome'));
+}
+function setLang(l){
+  if(l===lang) return;
+  lang = l;
+  try { localStorage.setItem('mb-lang',l); } catch(e){}
+  applyStatic(); loadAns(); renderList(); resetChat();
+  toast(t('lang.toast'),'info');
+}
+
+/* =====================================================
+   LEFT LIST
+===================================================== */
+function renderFilters(){
+  var cnt = {all:mockups.length,draft:0,wip:0,review:0,done:0};
+  mockups.forEach(function(m){ cnt[m.status]++; });
+  var defs = [['all','f.all'],['draft','st.draft'],['wip','st.wip'],['review','st.review'],['done','st.done']];
+  document.getElementById('filters').innerHTML = defs.map(function(d){
+    return '<button class="filter-chip'+(filter===d[0]?' on':'')+'" onclick="setFilter(\''+d[0]+'\')">'+t(d[1])+'<span class="filter-count">'+cnt[d[0]]+'</span></button>';
+  }).join('');
+  document.getElementById('ls-done').textContent = t('ls.done',{n:cnt.done});
+  document.getElementById('ls-review').textContent = t('ls.review',{n:cnt.review});
+  document.getElementById('ls-draft').textContent = t('ls.draft',{n:cnt.draft+cnt.wip});
+  document.getElementById('ls-total').textContent = t('ls.total',{n:mockups.length});
+}
+function setFilter(f){ filter=f; renderList(); }
+
+function renderList(){
+  renderFilters();
+  var q = document.getElementById('search').value.trim().toLowerCase();
+  var list = mockups.filter(function(m){
+    var a = (m.id===cur)?ans:m.answers;
+    if(filter!=='all' && m.status!==filter) return false;
+    if(q && (tx(a.name)+' '+tx(a.project)).toLowerCase().indexOf(q)<0) return false;
+    return true;
+  });
+  var el = document.getElementById('mk-list');
+  if(!list.length){
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">&#128269;</div><div class="empty-title">'+t('list.empty.t')+'</div><div class="empty-sub">'+t('list.empty.s')+'</div></div>';
+    return;
+  }
+  el.innerHTML = list.map(function(m){
+    var a = (m.id===cur) ? ans : m.answers;
+    var p = pctOf(a);
+    return '<div class="mk-card'+(m.id===cur?' active':'')+'" onclick="openMockup('+m.id+')">'+
+      thumbHTML(a,false)+
+      '<div style="min-width:0">'+
+        '<div class="mk-name">'+escHTML(tx(a.name)||t('untitled'))+'</div>'+
+        '<div class="mk-proj">'+escHTML(tx(a.project)||'—')+'</div>'+
+        '<div class="mk-meta"><span class="format-badge '+STATUS_CLS[m.status]+'">'+t('st.'+m.status)+'</span>'+
+          (a.device?'<span class="format-badge fb-indigo">'+t('dev.'+a.device)+'</span>':'')+
+          (a.type?'<span class="format-badge fb-slate">'+t('type.'+a.type)+'</span>':'')+'</div>'+
+        '<div class="mk-foot"><div class="mk-prog'+(p===100?' full':'')+'"><div style="width:'+p+'%"></div></div><span class="mk-pct">'+p+'%</span><span class="mk-date">'+m.updated+'</span></div>'+
+      '</div>'+
+      '<div class="mk-actions">'+
+        '<button class="icon-btn" title="'+t('act.dup')+'" onclick="event.stopPropagation();dupMockup('+m.id+')">&#10697;</button>'+
+        '<button class="icon-btn" title="'+t('act.del')+'" onclick="event.stopPropagation();delMockup('+m.id+')">&#10005;</button>'+
+      '</div></div>';
+  }).join('');
+}
+
+function openMockup(id){
+  if(id===cur) return;
+  var m = getMk(id); if(!m) return;
+  cur = id; ans = clone(m.answers); tipped = {};
+  loadAns();
+  var first = 7; for(var s=1;s<=6;s++){ if(!stepDone(ans,s)){ first=s; break; } }
+  goStep(first,false);
+  renderList();
+  var p = pctOf(ans);
+  addAIMsg(t('msg.opened',{name:escHTML(tx(ans.name)),st:t('st.'+m.status),p:p}) +
+    (p===100 ? t('msg.opened.full') : t('msg.opened.jump',{tag:'<span class="tag">'+first+' · '+t('step.'+first)+'</span>'})));
+}
+function newMockup(){
+  cur = null; ans = emptyAns(); tipped = {};
+  loadAns(); goStep(1,false); renderList();
+  toast(t('toast.new'),'info');
+  addAIMsg(t('msg.new'));
+}
+function dupMockup(id){
+  var m = getMk(id); var a = clone(m.answers); a.name = tx(a.name)+' '+t('copy.suffix');
+  mockups.unshift({id:nextId++,status:'draft',updated:today(),answers:a});
+  renderList(); toast(t('toast.dup')+tx(m.answers.name),'success');
+}
+function delMockup(id){
+  var m = getMk(id);
+  mockups = mockups.filter(function(x){ return x.id!==id; });
+  if(cur===id){ cur=null; ans=emptyAns(); loadAns(); goStep(1,false); }
+  renderList(); toast(t('toast.del')+tx(m.answers.name),'warn');
+}
+
+/* =====================================================
+   WIZARD BINDING
+===================================================== */
+function loadAns(){
+  document.querySelectorAll('[data-f]').forEach(function(el){ el.value = tx(ans[el.getAttribute('data-f')]); });
+  document.querySelectorAll('[data-group]').forEach(function(g){
+    var f = g.getAttribute('data-group'), v = ans[f];
+    g.querySelectorAll('[data-v]').forEach(function(o){
+      var on = Array.isArray(v) ? v.indexOf(o.getAttribute('data-v'))>-1 : v===o.getAttribute('data-v');
+      o.classList.toggle('sel-on', on);
+    });
+  });
+  document.getElementById('radius-val').textContent = ans.radius+'px';
+  renderRefs(); refresh();
+}
+function bindInputs(){
+  document.querySelectorAll('[data-f]').forEach(function(el){
+    el.addEventListener('input', function(){
+      var f = el.getAttribute('data-f');
+      ans[f] = (el.type==='number'||el.type==='range') ? Number(el.value) : el.value;
+      if(f==='radius') document.getElementById('radius-val').textContent = el.value+'px';
+      refresh();
+    });
+  });
+  document.querySelectorAll('[data-group]').forEach(function(g){
+    g.addEventListener('click', function(e){
+      var o = e.target.closest('[data-v]'); if(!o || !g.contains(o)) return;
+      var f = g.getAttribute('data-group'), v = o.getAttribute('data-v');
+      if(g.hasAttribute('data-multi')){
+        var i = ans[f].indexOf(v);
+        if(i>-1) ans[f].splice(i,1); else ans[f].push(v);
+        o.classList.toggle('sel-on');
+      } else {
+        ans[f] = v;
+        g.querySelectorAll('[data-v]').forEach(function(x){ x.classList.toggle('sel-on', x===o); });
+      }
+      refresh();
+    });
+  });
+}
+
+/* =====================================================
+   STEPPER / NAV
+===================================================== */
+function renderStepper(){
+  var html='';
+  for(var s=1;s<=7;s++){
+    var cls = s===step?'cur':(s<7&&stepDone(ans,s)?'done':'');
+    if(s===7 && pctOf(ans)===100 && step!==7) cls='done';
+    html += '<div class="st '+cls+'" onclick="goStep('+s+',true)" title="'+t('step.'+s)+'"><div class="st-num">'+(cls==='done'?'✓':s)+'</div><div class="st-lbl">'+t('stepS.'+s)+'</div></div>';
+  }
+  document.getElementById('stepper').innerHTML = html;
+}
+function goStep(n,user){
+  if(n<1||n>7) return;
+  step = n;
+  document.querySelectorAll('.wz-step').forEach(function(s){ s.classList.toggle('on', Number(s.getAttribute('data-step'))===n); });
+  document.getElementById('prev-btn').disabled = n===1;
+  document.getElementById('next-btn').style.visibility = n===7 ? 'hidden' : 'visible';
+  document.getElementById('wz-body').scrollTop = 0;
+  refresh();
+  if(user && !tipped[n]){ tipped[n]=true; setTimeout(function(){ addAIMsg(t('tip.'+n)); },250); }
+}
+function refresh(){
+  var p = pctOf(ans), n=0;
+  REQ_ALL.forEach(function(f){ if(filled(ans,f)) n++; });
+  document.getElementById('wz-bar').style.width = p+'%';
+  document.getElementById('wz-ptxt').textContent = t('wz.progress',{s:step,n:n,t:REQ_ALL.length,p:p});
+  document.getElementById('wz-title').textContent = t('wz.title',{name:tx(ans.name)||t('untitled')});
+  var b = document.getElementById('wz-badge');
+  if(cur===null){ b.className='format-badge fb-slate'; b.textContent=t('st.new'); }
+  else { var st=getMk(cur).status; b.className='format-badge '+STATUS_CLS[st]; b.textContent=t('st.'+st); }
+  renderStepper();
+  if(step===7) renderReview();
+  if(cur!==null) renderListLite();
+}
+var _lt; function renderListLite(){ clearTimeout(_lt); _lt=setTimeout(renderList,120); }
+
+/* =====================================================
+   REVIEW
+===================================================== */
+function fmt(f){
+  var v = ans[f];
+  if(f==='users') return v.map(function(x){ return t('u.'+x); }).join(' · ');
+  if(f==='components') return v.map(function(x){ return t('c.'+x); }).join(' · ');
+  if(f==='lang') return LANG_NAMES[v]||v;
+  if(f==='terms') return v==='none'?t('terms.none'):v;
+  if(PREFIX[f]) return lbl(f,v);
+  return escHTML(tx(v));
+}
+function renderReview(){
+  document.getElementById('rv-thumb').innerHTML = thumbHTML(ans,true);
+  var bd='';
+  if(ans.device) bd += '<span class="format-badge fb-indigo">'+lbl('device',ans.device)+'</span>';
+  if(ans.layout) bd += '<span class="format-badge fb-amber">'+lbl('layout',ans.layout)+'</span>';
+  if(ans.palette) bd += '<span class="format-badge fb-emerald">'+lbl('palette',ans.palette)+'</span>';
+  document.getElementById('rv-badges').innerHTML = bd || '<span class="format-badge fb-rose">'+t('rv.nolayout')+'</span>';
+
+  var ck='';
+  for(var s=1;s<=6;s++){
+    var ok = stepDone(ans,s);
+    ck += '<div class="ck '+(ok?'ok':'no')+'"><div class="ck-ic">'+(ok?'✓':'!')+'</div><span style="flex:1">'+s+'. '+t('step.'+s)+'</span>'+
+          (ok?'':'<span class="rv-edit" onclick="goStep('+s+',true)">'+t('rv.fill')+'</span>')+'</div>';
+  }
+  document.getElementById('rv-checks').innerHTML = ck;
+
+  var rows = [['q.name','name',1],['q.type','type',1],['q.goal','goal',2],['q.users','users',2],['q.device','device',3],['q.layout','layout',3],
+              ['q.screens','screens',3],['q.palette','palette',4],['q.font','font',4],['q.components','components',5],['q.interaction','interaction',5],
+              ['q.data','dataSource',6],['q.lang','lang',6]];
+  document.getElementById('rv-table').innerHTML = rows.map(function(r){
+    var v = fmt(r[1]), req = REQ_ALL.indexOf(r[1])>-1;
+    return '<tr><td>'+t(r[0])+'</td><td>'+(v || (req?'<span class="miss">'+t('rv.missing')+'</span>':'<span style="color:var(--slate-300)">—</span>'))+
+           '<span class="rv-edit" onclick="goStep('+r[2]+',true)">'+t('rv.edit')+'</span></td></tr>';
+  }).join('');
+
+  var p = pctOf(ans);
+  document.getElementById('gen-btn').disabled = p<100;
+  document.getElementById('gen-desc').textContent = p<100 ? t('gen.missing',{n:missing().length}) :
+    t('gen.ready',{s:ans.screens||1,i:lbl('interaction',ans.interaction),d:lbl('device',ans.device)});
+}
+
+/* =====================================================
+   SAVE / GENERATE
+===================================================== */
+function persist(status){
+  if(cur===null){
+    var m = {id:nextId++,status:status,updated:today(),answers:clone(ans)};
+    mockups.unshift(m); cur = m.id;
+  } else {
+    var m2 = getMk(cur); m2.answers = clone(ans); m2.status = status; m2.updated = today();
+  }
+  renderList(); refresh();
+}
+function saveDraft(){
+  if(!String(tx(ans.name)).trim()){ toast(t('toast.needName'),'warn'); goStep(1,false); return; }
+  var st = cur===null ? 'draft' : getMk(cur).status;
+  if(st!=='done' && st!=='review') st = (pctOf(ans)>0 && pctOf(ans)<100) ? 'wip' : 'draft';
+  persist(st);
+  toast(t('toast.saved')+tx(ans.name),'success');
+}
+function generate(){
+  if(pctOf(ans)<100){ toast(t('toast.missingReq'),'warn'); return; }
+  var btn = document.getElementById('gen-btn'), sp = document.getElementById('gen-spin');
+  btn.disabled = true; sp.style.display = 'block';
+  document.getElementById('hdr-status').textContent = t('app.generating');
+  showTyping();
+  setTimeout(function(){
+    hideTyping(); sp.style.display='none'; btn.disabled=false;
+    document.getElementById('hdr-status').textContent = t('app.status');
+    persist('review');
+    var name = tx(ans.name);
+    toast(t('toast.generated')+name,'success');
+    addAIMsg(t('gen.msg.head',{name:escHTML(name)})+'<br><br>'+
+      '&bull; '+t('gen.msg.vp')+': <code>'+lbl('device',ans.device)+'</code><br>'+
+      '&bull; '+t('gen.msg.layout')+': <code>'+lbl('layout',ans.layout)+'</code> · '+ans.screens+' '+t('gen.msg.screens')+'<br>'+
+      '&bull; '+t('gen.msg.palette')+': <code>'+lbl('palette',ans.palette)+'</code><br>'+
+      '&bull; '+t('gen.msg.comps')+': '+ans.components.map(function(c){ return '<span class="tag">'+t('c.'+c)+'</span>'; }).join(' ')+'<br><br>'+
+      t('gen.msg.file')+': <code>'+escHTML(name.replace(/\s+/g,'_'))+'_v1.html</code>. '+t('gen.msg.ask'));
+  },1600);
+}
+
+/* =====================================================
+   REFERENCES
+===================================================== */
+function triggerRefInput(){ document.getElementById('ref-input').click(); }
+function handleRefs(input){
+  var names = Array.from(input.files).map(function(f){ return f.name; });
+  if(!names.length) return;
+  names.forEach(function(n){ if(ans.refs.indexOf(n)<0) ans.refs.push(n); });
+  renderRefs(); input.value='';
+  toast(t('toast.refs')+names.join(', '),'info');
+  showTyping();
+  setTimeout(function(){ hideTyping();
+    addAIMsg(t('msg.refs',{files:'<code>'+escHTML(names.join(', '))+'</code>',vp:'<span class="tag">1440×900</span>',
+      c1:'<span class="tag">#4f46e5</span>',c2:'<span class="tag">#fbbf24</span>',btn:'<span class="apply" onclick="autofillFromRef()">'+t('btn.apply')+'</span>'}));
+  },1000);
+}
+function renderRefs(){
+  document.getElementById('ref-list').innerHTML = ans.refs.map(function(r,i){
+    return '<div class="ref-item">&#128196; <span>'+escHTML(r)+'</span><button class="icon-btn" onclick="ans.refs.splice('+i+',1);renderRefs()">&#10005;</button></div>';
+  }).join('');
+}
+function autofillFromRef(){
+  if(ans.refs.indexOf('Tech_Pubs_Converter_v1.html')<0) ans.refs.push('Tech_Pubs_Converter_v1.html');
+  if(!ans.type) ans.type='web';
+  ans.device='desktop'; ans.layout='three'; ans.palette='indigo'; ans.font='Outfit + Source Code Pro'; ans.radius=12; ans.nav='top';
+  ['upload','chat','toast'].forEach(function(c){ if(ans.components.indexOf(c)<0) ans.components.push(c); });
+  if(!ans.interaction) ans.interaction='full';
+  loadAns();
+  toast(t('toast.autofill'),'success');
+  addAIMsg(t('msg.autofill',{file:'<code>Tech_Pubs_Converter_v1.html</code>',grid:'<code>1fr 1fr 360px</code>'}));
+}
+
+/* =====================================================
+   CHAT
+===================================================== */
+var SUGGEST = {
+  1:function(){ if(!filled(ans,'name')) ans.name=t('sug.name'); if(!ans.type) ans.type='web'; return '<span class="tag">'+lbl('type',ans.type)+'</span>'; },
+  2:function(){ if(!filled(ans,'goal')) ans.goal=t('sug.goal'); ['writer','engineer'].forEach(function(u){ if(ans.users.indexOf(u)<0) ans.users.push(u); });
+               return ans.users.map(function(u){ return '<span class="tag">'+t('u.'+u)+'</span>'; }).join(' '); },
+  3:function(){ if(!ans.device) ans.device = ans.type==='mobile'?'mobile':'desktop'; if(!ans.layout) ans.layout = ans.device==='mobile'?'single':(ans.type==='dash'?'grid':'three');
+               return '<span class="tag">'+lbl('device',ans.device)+'</span> <span class="tag">'+lbl('layout',ans.layout)+'</span>'; },
+  4:function(){ if(!ans.palette) ans.palette='indigo'; return '<span class="tag">'+lbl('palette',ans.palette)+'</span>'; },
+  5:function(){ if(!ans.components.length) ans.components = ans.type==='dash'?['chart','table','search']:['form','chat','toast']; if(!ans.interaction) ans.interaction='click';
+               return '<span class="tag">'+lbl('interaction',ans.interaction)+'</span>'; },
+  6:function(){ if(!ans.dataSource) ans.dataSource='fake'; return '<span class="tag">'+lbl('dataSource',ans.dataSource)+'</span>'; },
+  7:function(){ missing().forEach(function(f){ SUGGEST[FIELD_STEP[f]](); }); return t('sug.all'); }
+};
+function chatAction(type){
+  addUserMsg(t('qa.'+type+'.u')); showTyping();
+  setTimeout(function(){
+    hideTyping();
+    if(type==='explain') addAIMsg(t('tip.'+step));
+    else if(type==='suggest'){ var what = SUGGEST[step](); loadAns(); addAIMsg(t('sug.done',{s:step,what:what})); toast(t('toast.sug'),'success'); }
+    else if(type==='check'){
+      var m = missing();
+      addAIMsg(m.length ? (t('chk.missing',{n:m.length})+'<br><br>'+m.map(function(f){ return '&#9888; '+t(FIELD_KEY[f])+' <span class="tag">'+t('chk.step',{s:FIELD_STEP[f]})+'</span>'; }).join('<br>')+
+                 '<br><br><span class="apply" onclick="goStep('+FIELD_STEP[m[0]]+',true)">'+t('chk.jump')+'</span>')
+                       : t('chk.ok')+'<br><br><span class="apply" onclick="goStep(7,true)">'+t('chk.go')+'</span>');
+    }
+    else if(type==='spec'){
+      addAIMsg('<strong>'+t('spec.title')+' · '+escHTML(tx(ans.name)||t('untitled'))+'</strong><br><br>'+
+        '<code>type</code> '+(fmt('type')||'—')+'<br><code>viewport</code> '+(fmt('device')||'—')+'<br><code>layout</code> '+(fmt('layout')||'—')+'<br>'+
+        '<code>palette</code> '+(fmt('palette')||'—')+'<br><code>font</code> '+escHTML(ans.font)+'<br><code>radius</code> '+ans.radius+'px<br>'+
+        '<code>components</code> '+(fmt('components')||'—')+'<br><code>interaction</code> '+(fmt('interaction')||'—')+'<br><code>lang</code> '+fmt('lang'));
+    }
+  },900);
+}
+function runUXCheck(){
+  if(!filled(ans,'name')){ toast(t('ux.need'),'warn'); return; }
+  toast(t('ux.running'),'info'); showTyping();
+  setTimeout(function(){
+    hideTyping();
+    var w = [];
+    if(ans.device==='mobile' && ans.layout==='three') w.push(t('ux.w1'));
+    if(ans.components.length>6) w.push(t('ux.w2',{n:ans.components.length}));
+    if(ans.palette==='dark' && ans.users.indexOf('pilot')<0) w.push(t('ux.w3'));
+    if(ans.radius>16) w.push(t('ux.w4',{n:ans.radius}));
+    if(!filled(ans,'flow')) w.push(t('ux.w5'));
+    toast(w.length ? t('ux.toastWarn',{n:w.length}) : t('ux.toastOk'), w.length?'warn':'success');
+    addAIMsg(t('ux.head')+(w.length ? '<br>'+w.map(function(x){ return '&#9888; '+x; }).join('<br>')+'<br><br>'+t('ux.advice') : '<br>'+t('ux.ok')));
+  },1100);
+}
+function addAIMsg(txt){
+  var c = document.getElementById('chat-msgs'), d = document.createElement('div');
+  d.className='msg ai';
+  d.innerHTML='<div class="msg-av">&#129302;</div><div><div class="bubble">'+txt+'</div><div class="msg-time">'+t('now')+'</div></div>';
+  c.appendChild(d); c.scrollTop=c.scrollHeight;
+}
+function addUserMsg(txt){
+  var c = document.getElementById('chat-msgs'), d = document.createElement('div');
+  d.className='msg user';
+  d.innerHTML='<div class="msg-av">&#128100;</div><div><div class="bubble">'+escHTML(txt)+'</div><div class="msg-time">'+t('now')+'</div></div>';
+  c.appendChild(d); c.scrollTop=c.scrollHeight;
+}
+function showTyping(){
+  var c = document.getElementById('chat-msgs'), d = document.createElement('div');
+  d.className='typing'; d.id='typing-ind';
+  d.innerHTML='<div class="msg-av" style="background:linear-gradient(135deg,#6366f1,#a5b4fc)">&#129302;</div><div class="typing-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
+  c.appendChild(d); c.scrollTop=c.scrollHeight;
+}
+function hideTyping(){ var e=document.getElementById('typing-ind'); if(e) e.remove(); }
+
+function sendMsg(){
+  var inp = document.getElementById('chat-in'), q = inp.value.trim(); if(!q) return;
+  inp.value=''; inp.style.height='auto';
+  addUserMsg(q); showTyping();
+  var r;
+  if(/颜色|调色|palette|color|түс|палитра|paleta/i.test(q)) r=t('r.color');
+  else if(/布局|分栏|layout|макет|баған|columna/i.test(q)) r=t('r.layout');
+  else if(/尺寸|大小|分辨率|size|viewport|өлшем|tamaño|resoluci/i.test(q)) r=t('r.size');
+  else if(/组件|component|компонент/i.test(q)) r=t('r.comp');
+  else if(/生成|导出|html|жасау|экспорт|generar|exportar/i.test(q)) r=t('r.gen');
+  else r=t('r.default',{s:step,name:t('step.'+step)})+'<br>'+t('tip.'+step).replace(/^<strong>.*?<\/strong><br>/,'');
+  setTimeout(function(){ hideTyping(); addAIMsg(r); }, 800+Math.random()*500);
+}
+document.getElementById('chat-in').addEventListener('keydown',function(e){ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); sendMsg(); } });
+document.getElementById('chat-in').addEventListener('input',function(){ this.style.height='auto'; this.style.height=Math.min(this.scrollHeight,100)+'px'; });
+
+function toast(msg,type){
+  var c=document.getElementById('toasts'), el=document.createElement('div');
+  el.className='toast toast-'+(type||'info'); el.textContent=msg; c.appendChild(el);
+  setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el); },3000);
+}
+
+/* INIT */
+buildChips(); bindInputs(); applyStatic(); resetChat();
+loadAns(); goStep(1,false); renderList();
+setTimeout(function(){ openMockup(3); },500);
+</script>
+</body>
+</html>

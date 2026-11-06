@@ -7,7 +7,7 @@ JDR sustituye un mockup HTML de un solo fichero ([`docs/reference/mockup-builder
 - Postgres es la fuente de verdad y nada de estado en el navegador (HR1).
 - La autenticación va en cookies HTTP-only fijadas por el servidor.
 
-brdp-manager, que sirve de referencia para la capa IA, usa otra pila (Vite + JS con un `server.js` de Node). Eso es precisamente lo que plantea la pregunta abierta 1.
+brdp-manager, que sirve de referencia para la capa IA, usa otra pila (Vite + JS con un `server.js` de Node). Eso es precisamente lo que plantea la [pregunta abierta 1](README.md#preguntas-abiertas).
 
 ## Decisión
 
@@ -25,7 +25,7 @@ Usar la plantilla `aacf/templates/web-app.md`:
 
 - E01 monta el andamiaje con esta pila (docker-compose, CI y dependencias fijadas).
 - De brdp-manager no se reutiliza código; solo se toma como referencia de diseño para la capa IA (ADR-002, ADR-003).
-- Hace falta un Keycloak disponible, en desarrollo y en despliegue (pregunta abierta 2).
+- Hace falta un Keycloak disponible, en desarrollo y en despliegue ([pregunta abierta 2](README.md#preguntas-abiertas)).
 - Aplican las reglas de lenguaje `aacf/rules/python.mdc` y `aacf/rules/javascript.mdc`. Además, nunca se usa `from __future__ import annotations` en ficheros de rutas FastAPI.
 
 ## Estado

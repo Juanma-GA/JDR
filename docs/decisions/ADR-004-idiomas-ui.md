@@ -15,7 +15,7 @@ El mockup de referencia ofrece la interfaz en chino (zh), kazajo (kk) y español
 
 - E02 (Diseño e i18n) elige la biblioteca i18n compatible con React + Vite, crea los catálogos `zh`, `kk` y `es` y migra los textos del mockup.
 - Cada encargo posterior que añada texto de UI debe darlo en los tres idiomas (definición de hecho).
-- Falta decidir si se añade inglés (pregunta abierta 4).
+- Falta decidir si se añade inglés ([pregunta abierta 4](README.md#preguntas-abiertas)).
 
 ## Estado
 

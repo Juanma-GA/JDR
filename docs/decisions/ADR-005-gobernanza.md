@@ -13,7 +13,7 @@ El nivel decide qué controles, revisiones y endurecimiento (`codebase-hardening
 
 ## Decisión
 
-Por decidir entre T2, T3 y T4 (pregunta abierta 6). Mientras tanto, cada encargo aplica como mínimo los controles de T2, y E14 (seguridad, hardening y despliegue) se planifica con `codebase-hardening`.
+Por decidir entre T2, T3 y T4 ([pregunta abierta 6](README.md#preguntas-abiertas)). Mientras tanto, cada encargo aplica como mínimo los controles de T2, y E14 (seguridad, hardening y despliegue) se planifica con `codebase-hardening`.
 
 ## Consecuencias
 

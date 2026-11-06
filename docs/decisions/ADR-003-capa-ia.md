@@ -36,7 +36,7 @@ Además (ai-output-safety): el HTML generado se previsualiza en un iframe sandbo
 
 ## Consecuencias
 
-- **E08** crea el cliente LLM, la configuración de IA en admin y la lista blanca de proveedores y endpoints. Depende de qué proveedores estén permitidos (pregunta abierta 3).
+- **E08** crea el cliente LLM, la configuración de IA en admin y la lista blanca de proveedores y endpoints. Depende de qué proveedores estén permitidos ([pregunta abierta 3](README.md#preguntas-abiertas)).
 - **E09–E12** consumen el cliente solo mediante endpoints de negocio `/api/ai/...`.
 - **E13** añade evals de los activos de prompt con fixtures, apoyándose en la regla 10.
 - Todo encargo que toque prompts pasa por `senior-prompt-engineer`, y todo el que toque LLM, datos o dependencias pasa por `security-reviewer`.

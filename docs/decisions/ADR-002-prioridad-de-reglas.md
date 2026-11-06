@@ -12,7 +12,7 @@ Si brdp-manager y AACF chocan, gana AACF. De brdp-manager se toman ideas de dise
 
 - Cada patrón que se tome de brdp-manager debe pasar la autocomprobación HR0–HR21 antes de entrar en un checklist.
 - Las desviaciones conocidas están en la tabla de ADR-003. Si aparece otra, se añade ahí.
-- Hay que confirmar si el repo de referencia (fork revisado) coincide con ATEXIS/BRDP-Manager (pregunta abierta 7).
+- Hay que confirmar si el repo de referencia (fork revisado) coincide con ATEXIS/BRDP-Manager ([pregunta abierta 7](README.md#preguntas-abiertas)).
 
 ## Estado
 
